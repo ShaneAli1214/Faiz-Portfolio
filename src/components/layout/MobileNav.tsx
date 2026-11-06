@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, Lock, ExternalLink } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 interface NavLink {
@@ -115,6 +116,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
         {/* Footer info in drawer */}
         <div className="pt-6 border-t border-border-muted text-xs text-content-muted">
+          <div className="mb-4">
+            <ThemeToggle showLabel className="w-full justify-center py-2.5" />
+          </div>
           <p className="font-semibold text-content-secondary">
             Muhammad Faiz Waheed
           </p>

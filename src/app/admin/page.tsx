@@ -183,18 +183,67 @@ export default function AdminPage() {
         if (typeof document !== "undefined") {
           const styleEl = document.getElementById("dynamic-theme-vars");
           if (styleEl) {
+            const d = updatedTheme.dark || defaultTheme.dark;
+            const l = updatedTheme.light || defaultTheme.light;
+            const s = updatedTheme.semantics || defaultTheme.semantics;
             styleEl.innerHTML = `
               :root {
-                --background-primary: ${updatedTheme.backgroundColor};
-                --background-secondary: ${updatedTheme.cardBackground};
-                --card-background: ${updatedTheme.cardBackground};
-                --accent-emerald: ${updatedTheme.primaryColor};
-                --accent-emerald-light: ${updatedTheme.accentEmeraldLight || "#34D399"};
-                --accent-gold: ${updatedTheme.secondaryColor};
-                --accent-gold-light: ${updatedTheme.accentGoldLight || "#F3E5AB"};
-                --text-primary: ${updatedTheme.headingColor};
-                --text-secondary: ${updatedTheme.bodyTextColor};
-                --border-subtle: ${updatedTheme.borderColor};
+                --background-primary: ${l.mainBackground};
+                --background-secondary: ${l.secondaryBackground};
+                --background-tertiary: ${l.elevatedSurface};
+                --card-background: ${l.cardBackground};
+                --elevated-surface: ${l.elevatedSurface};
+                --primary-color: ${l.primaryColor};
+                --primary-hover: ${l.primaryHover};
+                --secondary-accent: ${l.secondaryAccent};
+                --accent-emerald: ${l.primaryColor};
+                --accent-emerald-light: ${l.secondaryAccent};
+                --accent-emerald-dark: ${l.primaryHover};
+                --accent-gold: ${l.secondaryAccent};
+                --accent-gold-light: ${l.secondaryAccent};
+                --accent-gold-dark: ${l.primaryHover};
+                --text-primary: ${l.mainText};
+                --text-secondary: ${l.secondaryText};
+                --text-muted: ${l.mutedText};
+                --border-subtle: ${l.border};
+                --border-muted: ${l.border};
+                --input-background: ${l.inputBackground};
+                --sidebar-background: ${l.sidebarBackground};
+                --header-background: ${l.headerBackground};
+                --focus-ring: ${l.focusRing};
+                --color-success: ${s.success};
+                --color-warning: ${s.warning};
+                --color-error: ${s.error};
+                --color-info: ${s.info};
+              }
+              html.dark, :root.dark {
+                --background-primary: ${d.mainBackground};
+                --background-secondary: ${d.secondaryBackground};
+                --background-tertiary: ${d.elevatedSurface};
+                --card-background: ${d.cardBackground};
+                --elevated-surface: ${d.elevatedSurface};
+                --primary-color: ${d.primaryColor};
+                --primary-hover: ${d.primaryHover};
+                --secondary-accent: ${d.secondaryAccent};
+                --accent-emerald: ${d.primaryColor};
+                --accent-emerald-light: ${d.primaryHover};
+                --accent-emerald-dark: ${d.primaryColor};
+                --accent-gold: ${d.secondaryAccent};
+                --accent-gold-light: ${d.secondaryAccent};
+                --accent-gold-dark: ${d.primaryColor};
+                --text-primary: ${d.mainText};
+                --text-secondary: ${d.secondaryText};
+                --text-muted: ${d.mutedText};
+                --border-subtle: ${d.border};
+                --border-muted: ${d.border};
+                --input-background: ${d.inputBackground};
+                --sidebar-background: ${d.sidebarBackground};
+                --header-background: ${d.headerBackground};
+                --focus-ring: ${d.focusRing};
+                --color-success: ${s.success};
+                --color-warning: ${s.warning};
+                --color-error: ${s.error};
+                --color-info: ${s.info};
               }
             `;
           }
@@ -220,7 +269,7 @@ export default function AdminPage() {
       const result = await res.json();
       if (res.ok && result.success) {
         setThemeConfig(result.theme);
-        addToast("Theme reset to verified Dark Emerald default.", "success");
+        addToast("Theme reset to verified Charcoal & Electric Blue defaults.", "success");
       }
     } catch {
       addToast("Error resetting theme.", "error");

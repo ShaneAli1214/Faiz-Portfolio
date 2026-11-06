@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, Shield } from "lucide-react";
 import { initialPortfolioData } from "@/data/portfolioData";
 import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
@@ -64,7 +65,9 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right Action Area */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
+
             <Link
               href="/admin"
               className={cn(

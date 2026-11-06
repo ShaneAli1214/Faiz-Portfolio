@@ -18,7 +18,13 @@ export class ThemeService {
       if (fs.existsSync(THEME_FILE_PATH)) {
         const raw = fs.readFileSync(THEME_FILE_PATH, "utf8");
         const parsed = JSON.parse(raw);
-        const combined: ThemeConfig = { ...defaultTheme, ...parsed };
+        const combined: ThemeConfig = {
+          ...defaultTheme,
+          ...parsed,
+          dark: { ...defaultTheme.dark, ...(parsed.dark || {}) },
+          light: { ...defaultTheme.light, ...(parsed.light || {}) },
+          semantics: { ...defaultTheme.semantics, ...(parsed.semantics || {}) },
+        };
         this.cachedTheme = combined;
         return combined;
       } else {

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ThemeService } from "@/lib/theme-service";
+import { defaultDarkPalette, defaultLightPalette, defaultSemantics } from "@/types/theme";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,8 +17,8 @@ const inter = Inter({
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://faizwaheed.com";
 
 export const viewport: Viewport = {
-  themeColor: "#090D12",
-  colorScheme: "dark",
+  themeColor: "#11151C",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
 };
@@ -85,26 +86,92 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const currentTheme = ThemeService.getTheme();
+  const dark = currentTheme.dark || defaultDarkPalette;
+  const light = currentTheme.light || defaultLightPalette;
+  const semantics = currentTheme.semantics || defaultSemantics;
 
   return (
     <html lang="en" suppressHydrationWarning className={`dark ${inter.variable}`}>
       <head>
         <JsonLd />
+        <script
+          id="theme-initializer"
+          dangerouslySetInnerHTML={{
+            __html: `(function() {
+              try {
+                var savedMode = localStorage.getItem('portfolio-theme-mode');
+                if (savedMode === 'light') {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.classList.add('light');
+                } else {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.classList.remove('light');
+                }
+              } catch (e) {}
+            })();`,
+          }}
+        />
         <style
           id="dynamic-theme-vars"
           dangerouslySetInnerHTML={{
             __html: `
               :root {
-                --background-primary: ${currentTheme.backgroundColor};
-                --background-secondary: ${currentTheme.cardBackground};
-                --card-background: ${currentTheme.cardBackground};
-                --accent-emerald: ${currentTheme.primaryColor};
-                --accent-emerald-light: ${currentTheme.accentEmeraldLight || "#34D399"};
-                --accent-gold: ${currentTheme.secondaryColor};
-                --accent-gold-light: ${currentTheme.accentGoldLight || "#F3E5AB"};
-                --text-primary: ${currentTheme.headingColor};
-                --text-secondary: ${currentTheme.bodyTextColor};
-                --border-subtle: ${currentTheme.borderColor};
+                --background-primary: ${light.mainBackground};
+                --background-secondary: ${light.secondaryBackground};
+                --background-tertiary: ${light.elevatedSurface};
+                --card-background: ${light.cardBackground};
+                --elevated-surface: ${light.elevatedSurface};
+                --primary-color: ${light.primaryColor};
+                --primary-hover: ${light.primaryHover};
+                --secondary-accent: ${light.secondaryAccent};
+                --accent-emerald: ${light.primaryColor};
+                --accent-emerald-light: ${light.secondaryAccent};
+                --accent-emerald-dark: ${light.primaryHover};
+                --accent-gold: ${light.secondaryAccent};
+                --accent-gold-light: ${light.secondaryAccent};
+                --accent-gold-dark: ${light.primaryHover};
+                --text-primary: ${light.mainText};
+                --text-secondary: ${light.secondaryText};
+                --text-muted: ${light.mutedText};
+                --border-subtle: ${light.border};
+                --border-muted: ${light.border};
+                --input-background: ${light.inputBackground};
+                --sidebar-background: ${light.sidebarBackground};
+                --header-background: ${light.headerBackground};
+                --focus-ring: ${light.focusRing};
+                --color-success: ${semantics.success};
+                --color-warning: ${semantics.warning};
+                --color-error: ${semantics.error};
+                --color-info: ${semantics.info};
+              }
+              html.dark, :root.dark {
+                --background-primary: ${dark.mainBackground};
+                --background-secondary: ${dark.secondaryBackground};
+                --background-tertiary: ${dark.elevatedSurface};
+                --card-background: ${dark.cardBackground};
+                --elevated-surface: ${dark.elevatedSurface};
+                --primary-color: ${dark.primaryColor};
+                --primary-hover: ${dark.primaryHover};
+                --secondary-accent: ${dark.secondaryAccent};
+                --accent-emerald: ${dark.primaryColor};
+                --accent-emerald-light: ${dark.primaryHover};
+                --accent-emerald-dark: ${dark.primaryColor};
+                --accent-gold: ${dark.secondaryAccent};
+                --accent-gold-light: ${dark.secondaryAccent};
+                --accent-gold-dark: ${dark.primaryColor};
+                --text-primary: ${dark.mainText};
+                --text-secondary: ${dark.secondaryText};
+                --text-muted: ${dark.mutedText};
+                --border-subtle: ${dark.border};
+                --border-muted: ${dark.border};
+                --input-background: ${dark.inputBackground};
+                --sidebar-background: ${dark.sidebarBackground};
+                --header-background: ${dark.headerBackground};
+                --focus-ring: ${dark.focusRing};
+                --color-success: ${semantics.success};
+                --color-warning: ${semantics.warning};
+                --color-error: ${semantics.error};
+                --color-info: ${semantics.info};
               }
             `,
           }}
