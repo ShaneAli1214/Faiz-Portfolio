@@ -1,0 +1,875 @@
+{
+  "profile": {
+    "fullName": "Muhammad Faiz Waheed",
+    "professionalTitle": "Chemical Engineer | Sustainability & Business Operations Professional",
+    "tagline": "Engineering Sustainable Solutions. Driving Business Impact.",
+    "aboutIntro": "I am a Chemical Engineer with a strong interest in combining engineering knowledge, analytical thinking and business understanding to contribute to sustainable industrial development.",
+    "bioSummary": "Chemical Engineer and Rector's Gold Medalist from NUST with proven expertise across industrial operations, project tracking, sustainability frameworks, and circular economy integration. Focused on engineering responsible, high-impact business systems.",
+    "degree": "BE Chemical Engineering",
+    "institution": "National University of Sciences and Technology (NUST)",
+    "cgpa": "3.53",
+    "honors": [
+      "Rector's Gold Medalist",
+      "Dean's List"
+    ],
+    "photoUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+    "homeHeroImage": {
+      "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+      "originalUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+      "scale": 1.0,
+      "positionX": 50,
+      "positionY": 20,
+      "fitMode": "cover",
+      "frameStyle": "auto",
+      "aspectRatio": "auto",
+      "maxWidth": "standard"
+    },
+    "aboutProfileImage": {
+      "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+      "originalUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+      "scale": 1.0,
+      "positionX": 50,
+      "positionY": 20,
+      "fitMode": "cover",
+      "frameStyle": "editorial",
+      "aspectRatio": "auto",
+      "maxWidth": "standard"
+    },
+    "contact": {
+      "email": "faizwaheed9@gmail.com",
+      "phone": "+92 324 5007850",
+      "linkedin": "https://www.linkedin.com/in/M.FaizWaheed",
+      "location": "Lahore / Islamabad, Pakistan",
+      "introHeading": "Let's Connect",
+      "introDescription": "Interested in discussing engineering, sustainability, supply chain, or professional opportunities? Feel free to get in touch.",
+      "availability": "Open for professional discussions, engineering consultations, and strategic collaborations.",
+      "availabilityAreas": [
+        "Professional opportunities",
+        "Engineering and sustainability discussions",
+        "Collaboration and networking"
+      ]
+    }
+  },
+  "highlights": [
+    {
+      "id": "hl-companies",
+      "value": "11",
+      "numericTarget": 11,
+      "prefix": "",
+      "suffix": "",
+      "label": "Group Companies",
+      "context": "Cross-functional industrial and commercial operational exposure"
+    },
+    {
+      "id": "hl-epc",
+      "value": "3+",
+      "numericTarget": 3,
+      "prefix": "",
+      "suffix": "+",
+      "label": "EPC & Tie-in Projects",
+      "context": "Industrial plant engineering, project tracking & shutdown tie-ins"
+    },
+    {
+      "id": "hl-orders",
+      "value": "500+",
+      "numericTarget": 500,
+      "prefix": "",
+      "suffix": "+",
+      "label": "Customer Orders",
+      "context": "Commercial distribution fulfillment & inventory management"
+    },
+    {
+      "id": "hl-workshops",
+      "value": "5+",
+      "numericTarget": 5,
+      "prefix": "",
+      "suffix": "+",
+      "label": "Technical Workshops",
+      "context": "Advanced process systems, safety, and specialized software"
+    },
+    {
+      "id": "hl-fundraising",
+      "value": "PKR 30,000",
+      "numericTarget": 30000,
+      "prefix": "PKR ",
+      "suffix": "",
+      "label": "Community Fundraising",
+      "context": "Civic leadership, student welfare, and social impact initiatives"
+    }
+  ],
+  "careerJourney": [
+    {
+      "year": "2017",
+      "title": "Commercial & Business Operations",
+      "organization": "Faiz Traders",
+      "description": "Initiated part-time business operations management, handling trade procurement, supplier communication, and customer fulfillment logs.",
+      "category": "Business"
+    },
+    {
+      "year": "2021",
+      "title": "Commenced BE Chemical Engineering",
+      "organization": "National University of Sciences and Technology (NUST)",
+      "description": "Started rigorous academic coursework in chemical process engineering, thermodynamics, mass and heat transfer, and mathematical modeling.",
+      "category": "Academic"
+    },
+    {
+      "year": "2022",
+      "title": "Director – Student Chapter Leadership",
+      "organization": "AIChE NUST Student Chapter",
+      "description": "Appointed as Director within the American Institute of Chemical Engineers (AIChE) student chapter, coordinating technical workshops, industrial seminars, and student engagement.",
+      "category": "Leadership"
+    },
+    {
+      "year": "2023",
+      "title": "Operations & E-commerce Associate",
+      "organization": "Daveyol Store",
+      "description": "Managed multi-channel online commercial operations, order fulfillment pipelines, and real-time inventory tracking for commercial retail.",
+      "category": "Operations"
+    },
+    {
+      "year": "2024",
+      "title": "Chemical Engineering Trainee",
+      "organization": "Attock Oil Refinery Limited (ARL)",
+      "description": "Completed industrial engineering internship inspecting refinery unit operations, crude distillation units, PFDs/P&IDs, and occupational plant safety protocols.",
+      "category": "Engineering"
+    },
+    {
+      "year": "2025",
+      "title": "Graduation (Rector's Gold Medalist) & Project Engineering",
+      "organization": "NUST & Descon Engineering Limited",
+      "description": "Graduated from NUST with a 3.53 CGPA and the Rector's Gold Medal. Joined Descon Engineering contributing to industrial project tracking, plant turnaround coordination, and Primavera P6 scheduling.",
+      "category": "Engineering"
+    },
+    {
+      "year": "2026",
+      "title": "Circular Economy & Responsible Supply Chain",
+      "organization": "Packages Group",
+      "description": "Joined Packages Group driving industrial circular economy assessments, ESG compliance tracking, material recovery initiatives, and responsible supply chain governance across group enterprises.",
+      "category": "Sustainability",
+      "isCurrent": true
+    }
+  ],
+  "professionalInterests": [
+    {
+      "title": "Chemical Engineering",
+      "description": "Core process engineering principles, unit operations, mass & energy balances, reaction kinetics, and plant safety design."
+    },
+    {
+      "title": "Circular Economy",
+      "description": "Designing closed-loop industrial material flows, byproduct recovery systems, and lifecycle resource efficiency models."
+    },
+    {
+      "title": "Sustainability & ESG",
+      "description": "Formulating environmental compliance frameworks, carbon emission metrics, and enterprise ESG reporting benchmarks."
+    },
+    {
+      "title": "Responsible Supply Chain",
+      "description": "Ethical sourcing standards, vendor compliance tracking, supplier sustainability audits, and resilient procurement logistics."
+    },
+    {
+      "title": "Risk & Compliance",
+      "description": "Operational risk registers, process hazard analysis, regulatory environmental compliance, and safety governance protocols."
+    },
+    {
+      "title": "Business Operations",
+      "description": "Aligning engineering execution with commercial objectives, resource planning, financial efficiency, and P&L tracking."
+    },
+    {
+      "title": "Project Coordination",
+      "description": "Multidisciplinary engineering schedule alignment, Primavera P6 milestone monitoring, and EPC tie-in coordination."
+    },
+    {
+      "title": "Operational Efficiency",
+      "description": "Lean manufacturing principles, bottleneck removal, process monitoring dashboards, and material loss reduction."
+    }
+  ],
+  "professionalValues": [
+    {
+      "title": "Analytical Thinking",
+      "description": "Deconstructing complex industrial processes and operational challenges into quantifiable, data-backed models for objective decision-making.",
+      "strengthContext": "Engineered mass-balance models & operational tracking systems"
+    },
+    {
+      "title": "Continuous Learning",
+      "description": "Proactively staying current with emerging green technologies, circular economy frameworks, SAP modules, and advanced project tracking methodologies.",
+      "strengthContext": "5+ technical workshops & specialized software proficiencies"
+    },
+    {
+      "title": "Responsible Leadership",
+      "description": "Leading teams and student initiatives with integrity, clear accountability, safety-first governance, and collaborative empowerment.",
+      "strengthContext": "AIChE NUST Directorship & PKR 30k community fundraising"
+    },
+    {
+      "title": "Effective Communication",
+      "description": "Translating intricate engineering data and operational parameters into clear, actionable executive summaries for multidisciplinary stakeholders.",
+      "strengthContext": "Cross-functional reporting across 11 group companies"
+    },
+    {
+      "title": "Planning & Organization",
+      "description": "Structuring multi-phase engineering tasks, critical path schedules, and logistics pipelines with rigorous attention to detail and risk mitigation.",
+      "strengthContext": "Primavera P6 tie-in schedules & 500+ order fulfillment"
+    },
+    {
+      "title": "Value-Driven Decision Making",
+      "description": "Evaluating engineering and commercial options by balancing financial return, environmental impact, and regulatory compliance standards.",
+      "strengthContext": "Convergence of sustainability and enterprise P&L impact"
+    }
+  ],
+  "experience": [
+    {
+      "id": "exp-packages",
+      "company": "Packages Group",
+      "companyAcronym": "PG",
+      "role": "Circular Economy & Responsible Supply Chain",
+      "duration": "July 2026 – Present",
+      "isCurrent": true,
+      "responsibilities": [
+        "Advancing circular economy and responsible supply chain initiatives across 11 Group companies.",
+        "Supporting sustainable procurement.",
+        "Conducting supplier sustainability assessments.",
+        "Supporting audit and compliance monitoring.",
+        "Contributing to waste reduction and resource efficiency.",
+        "Supporting EPR compliance.",
+        "Contributing to ESG reporting and KPI tracking.",
+        "Engaging with suppliers and supporting sustainability performance improvements."
+      ],
+      "skillsApplied": [
+        "Circular Economy",
+        "Sustainable Procurement",
+        "ESG Reporting",
+        "Supplier Engagement",
+        "Compliance Monitoring"
+      ],
+      "technologies": [
+        "Circular Economy",
+        "Sustainable Procurement",
+        "ESG Reporting",
+        "EPR Compliance",
+        "Compliance Monitoring"
+      ],
+      "keyMetric": "Sustainability initiatives across 11 Group companies",
+      "verified": true
+    },
+    {
+      "id": "exp-descon",
+      "company": "Descon Engineering Limited",
+      "companyAcronym": "DEL",
+      "role": "Engineer PMC",
+      "department": "Risk, Compliance & Sustainability (RC&S)",
+      "duration": "July 2025 – July 2026",
+      "responsibilities": [
+        "Monitored 3+ tie-ins and EPC projects.",
+        "Tracked Primavera P6 plans and progress updates.",
+        "Conducted budget-versus-actual analysis.",
+        "Analyzed risk exposure.",
+        "Developed cost-saving recommendations.",
+        "Supported management decision-making."
+      ],
+      "skillsApplied": [
+        "Primavera P6",
+        "Project Monitoring",
+        "Risk Analysis",
+        "Budget-versus-Actual Analysis"
+      ],
+      "technologies": [
+        "Primavera P6",
+        "Project Monitoring",
+        "Risk Analysis",
+        "Budget Analysis"
+      ],
+      "keyMetric": "Monitoring of 3+ EPC & tie-in projects",
+      "verified": true
+    },
+    {
+      "id": "exp-daveyol",
+      "company": "Daveyol Store",
+      "companyAcronym": "DS",
+      "role": "E-Commerce Operations",
+      "duration": "July 2023 – March 2025",
+      "responsibilities": [
+        "Managed 500+ customer orders.",
+        "Handled end-to-end order processing.",
+        "Coordinated inventory.",
+        "Ensured timely fulfillment.",
+        "Analyzed customer purchasing patterns and demand trends.",
+        "Optimized stock availability and product allocation."
+      ],
+      "skillsApplied": [
+        "Order Management",
+        "Inventory Coordination",
+        "Demand Analysis"
+      ],
+      "technologies": [
+        "Order Management",
+        "Inventory Coordination",
+        "Demand Analysis"
+      ],
+      "keyMetric": "Management of 500+ customer orders",
+      "verified": true
+    },
+    {
+      "id": "exp-faiz-traders",
+      "company": "Faiz Traders",
+      "companyAcronym": "FT",
+      "role": "Business Operations (Part-time)",
+      "duration": "March 2017 – Present",
+      "isCurrent": true,
+      "responsibilities": [
+        "Managed FMCG product sales and distribution.",
+        "Worked toward monthly revenue targets.",
+        "Maintained a consistent net profit margin of 10%.",
+        "Identified customer needs.",
+        "Introduced new products.",
+        "Managed purchasing and inventory.",
+        "Maintained customer relationships."
+      ],
+      "skillsApplied": [
+        "FMCG Operations",
+        "Sales and Distribution",
+        "Purchasing",
+        "Customer Relationships"
+      ],
+      "technologies": [
+        "FMCG Operations",
+        "Sales & Distribution",
+        "Purchasing",
+        "Customer Relations"
+      ],
+      "keyMetric": "10% consistent net profit margin",
+      "verified": true
+    },
+    {
+      "id": "exp-attock",
+      "company": "Attock Oil Refinery (ARL)",
+      "companyAcronym": "ARL",
+      "role": "Engineering Intern",
+      "duration": "June 2024 – July 2024",
+      "responsibilities": [
+        "Conducted process analysis on the Isomerization Unit for gasoline production.",
+        "Assisted in optimizing hydrocarbon feedstock processing.",
+        "Participated in quality testing."
+      ],
+      "skillsApplied": [
+        "Chemical Process Analysis",
+        "Hydrocarbon Processing",
+        "Quality Testing"
+      ],
+      "technologies": [
+        "Chemical Process Analysis",
+        "Hydrocarbon Processing",
+        "Quality Testing"
+      ],
+      "keyMetric": "Isomerization unit process optimization",
+      "verified": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-nust-capstone",
+      "title": "Final Year Engineering Design Project (Rector's Gold Medal Winner)",
+      "category": "Academic Projects",
+      "summary": "Comprehensive capstone chemical engineering design project at NUST awarded the Rector's Gold Medal for top distinction in BE Chemical Engineering.",
+      "description": "Senior design capstone project evaluating process synthesis, material and energy balances, unit operation sizing, and process safety compliance. Rigorously reviewed and recognized with the Rector's Gold Medal for the top graduating project.",
+      "technologies": [
+        "Chemical Process Design",
+        "NUST Capstone",
+        "Unit Operations",
+        "Thermodynamic Modeling"
+      ],
+      "keyContributions": [
+        "Awarded Rector's Gold Medal for best Final Year Project in Chemical Engineering at NUST",
+        "Evaluated and recognized by academic faculty board for technical excellence",
+        "Demonstrated comprehensive application of mass, energy, and process design fundamentals"
+      ],
+      "outcomes": [
+        "Awarded Rector's Gold Medal for highest academic and technical achievement",
+        "Top-ranked final year project in the graduating BE Chemical Engineering class"
+      ],
+      "problemStatement": "Rigorous chemical engineering design challenge addressing industrial process constraints, environmental standards, and economic plant feasibility.",
+      "objectives": [
+        "Develop optimized process simulation and unit operations design",
+        "Ensure rigorous material and energy balance compliance",
+        "Fulfill academic capstone standards evaluated by the NUST examination board"
+      ],
+      "methodology": "Process systems design, simulation modeling, and rigorous thermodynamic analysis.",
+      "implementation": "[Detailed process parameters, equipment sizing sheets, and simulation reports are reserved placeholders ready for candidate update via Admin Panel].",
+      "results": "Awarded Rector's Gold Medal for highest technical distinction across the NUST graduating engineering cohort.",
+      "visualType": "gold-medal",
+      "isFeaturedAcademic": true,
+      "isPlaceholderDetails": true,
+      "placeholderNotice": "Specific project title, detailed equipment specifications, and experimental data are reserved placeholders ready to be updated through the Admin Panel once provided.",
+      "visibility": true,
+      "verified": true
+    },
+    {
+      "id": "proj-circular-economy",
+      "title": "Industrial Circular Economy & Resource Recovery Framework",
+      "category": "Sustainability",
+      "summary": "Comprehensive material flow balance and resource recovery modeling designed to eliminate industrial effluents and cycle byproducts back into manufacturing streams.",
+      "description": "Applied industrial sustainability assessment across manufacturing streams, evaluating closed-loop resource recovery potential and establishing verifiable ESG benchmarks for waste minimization.",
+      "technologies": [
+        "Circular Economy",
+        "Material Lifecycle",
+        "Process Optimization",
+        "ESG Standards"
+      ],
+      "keyContributions": [
+        "Quantified industrial byproduct reuse streams across manufacturing operations",
+        "Designed closed-loop flow diagrams aligned with ESG benchmarks",
+        "Formulated lifecycle impact assessment methodologies for waste reduction"
+      ],
+      "outcomes": [
+        "Quantified industrial byproduct reuse streams",
+        "Designed closed-loop flow diagrams aligned with ESG benchmarks",
+        "Formulated lifecycle impact assessment methodologies"
+      ],
+      "problemStatement": "Linear manufacturing models generate byproduct waste streams and face escalating environmental compliance and disposal costs.",
+      "objectives": [
+        "Map material inputs and waste outputs across industrial manufacturing lines",
+        "Identify feasible closed-loop byproduct recovery pathways",
+        "Align resource efficiency metrics with national and international ESG standards"
+      ],
+      "methodology": "Mass balance accounting, material flow analysis (MFA), and industrial closed-loop recycling frameworks.",
+      "implementation": "Evaluated manufacturing streams across group companies, cataloging recyclable byproducts and assessing secondary utilization.",
+      "results": "Identified potential byproduct reuse opportunities and established verifiable ESG tracking metrics.",
+      "visualType": "circular",
+      "visibility": true,
+      "verified": true
+    },
+    {
+      "id": "proj-epc-tiein",
+      "title": "EPC Tie-in & Plant Turnaround Project Monitoring",
+      "category": "Engineering & Industrial",
+      "summary": "Execution tracking and milestone monitoring for complex plant shutdown operations, tie-in schedules, and resource allocation across multidisciplinary engineering teams.",
+      "description": "Project monitoring for 3+ EPC projects and industrial plant tie-ins utilizing Primavera P6, incorporating budget-versus-actual variance analysis and risk assessment.",
+      "technologies": [
+        "Primavera P6",
+        "SAP PS Module",
+        "Industrial Safety",
+        "Turnaround Management"
+      ],
+      "keyContributions": [
+        "Tracked critical path activities for 3+ EPC projects and shutdown tie-in schedules",
+        "Coordinated cross-discipline task sequencing to mitigate delay risks",
+        "Maintained structured progress reporting and variance analysis for management"
+      ],
+      "outcomes": [
+        "Tracked critical path activities for shutdown tie-in schedules",
+        "Coordinated cross-discipline task sequencing to mitigate delay risks",
+        "Maintained structured progress reporting for industrial stakeholders"
+      ],
+      "problemStatement": "Plant turnaround tie-ins carry severe delay and budget variance risks without rigorous real-time scheduling.",
+      "objectives": [
+        "Track critical path activities and milestone deliverables in Primavera P6",
+        "Perform budget-versus-actual cost variance analysis",
+        "Mitigate operational and safety risks during high-stakes plant shutdowns"
+      ],
+      "methodology": "Critical Path Method (CPM), Primavera P6 progress baselines, and RC&S risk exposure audits.",
+      "implementation": "Monitored 3+ EPC projects at Descon Engineering, updating daily progress baselines and coordinating with field engineers.",
+      "results": "Successfully monitored tie-ins with clear variance analysis and actionable cost-saving recommendations.",
+      "visualType": "timeline",
+      "visibility": true,
+      "verified": true
+    },
+    {
+      "id": "proj-supply-chain",
+      "title": "Supply Chain Commercial Operations & Fulfillment Optimization",
+      "category": "Data & Analytics",
+      "summary": "Streamlined multi-channel inventory fulfillment handling 500+ commercial orders with integrated supplier risk checks and lead-time optimization.",
+      "description": "Data-backed commercial operations optimization managing customer order processing, inventory turnover, supplier risk audits, and product fulfillment pipelines.",
+      "technologies": [
+        "Supply Chain Logistics",
+        "Power BI",
+        "Inventory Control",
+        "Risk Governance"
+      ],
+      "keyContributions": [
+        "Fulfilled 500+ commercial customer orders with zero critical delivery disruptions",
+        "Established operational dashboards tracking inventory turnover and fulfillment metrics",
+        "Implemented standardized supplier verification and commercial risk checks"
+      ],
+      "outcomes": [
+        "Fulfilled 500+ commercial customer orders with zero critical delivery disruptions",
+        "Established operational dashboards tracking inventory turnover and fulfillment metrics",
+        "Implemented standardized supplier verification and commercial risk checks"
+      ],
+      "problemStatement": "Rapidly scaling multi-channel commercial orders create inventory stockouts and delivery fulfillment bottlenecks.",
+      "objectives": [
+        "Standardize end-to-end commercial order processing",
+        "Analyze customer purchasing patterns and seasonal demand trends",
+        "Optimize safety stock levels and reduce inventory carrying costs"
+      ],
+      "methodology": "Demand pattern analysis, lead-time variance tracking, and inventory turnover KPIs.",
+      "implementation": "Built streamlined fulfillment protocols across Daveyol Store and Faiz Traders covering 500+ orders.",
+      "results": "Achieved consistent order fulfillment, minimized stockouts, and sustained 10% net profit margins.",
+      "visualType": "network",
+      "visibility": true,
+      "verified": true
+    },
+    {
+      "id": "proj-refinery-isomerization",
+      "title": "Refinery Gasoline Isomerization Unit Process Study",
+      "category": "Engineering & Industrial",
+      "summary": "Process engineering analysis on the catalytic isomerization unit at Attock Oil Refinery Limited (ARL), evaluating octane enhancement and hydrocarbon feedstock flow.",
+      "description": "Engineering study of light naphtha isomerization unit operations for high-octane gasoline blending, reviewing PFDs/P&IDs, reaction kinetics, and occupational plant safety protocols.",
+      "technologies": [
+        "Chemical Process Analysis",
+        "Refinery Unit Operations",
+        "PFD/P&ID",
+        "Quality Testing"
+      ],
+      "keyContributions": [
+        "Inspected light naphtha catalytic isomerization flow diagrams and reactor parameters",
+        "Assisted in monitoring hydrocarbon feedstock processing and product quality testing",
+        "Observed occupational safety protocols and hazard control in active refinery zones"
+      ],
+      "outcomes": [
+        "Conducted process analysis on gasoline isomerization unit",
+        "Assisted in optimizing hydrocarbon feedstock flow and laboratory quality testing"
+      ],
+      "problemStatement": "Optimizing light naphtha conversion to high-octane gasoline blending components while maintaining strict catalyst activity and safety standards.",
+      "objectives": [
+        "Understand reaction thermodynamics and catalyst regeneration cycles in isomerization",
+        "Analyze unit operational parameters (temperature, pressure, hydrogen-to-hydrocarbon ratio)",
+        "Assist senior engineers with product sampling and octane rating quality checks"
+      ],
+      "methodology": "Process flow diagram (PFD) and P&ID tracing, unit operation material balances, and laboratory fuel testing analysis.",
+      "implementation": "Field walkthroughs, control room parameter logging, and laboratory octane rating coordination at ARL.",
+      "results": "Gained verified foundational expertise in crude distillation, catalytic isomerization, and refinery process hazard control.",
+      "visualType": "refinery",
+      "visibility": true,
+      "verified": true
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-nust",
+      "degree": "Bachelor of Engineering in Chemical Engineering",
+      "field": "Chemical Engineering",
+      "institution": "National University of Sciences and Technology (NUST)",
+      "campus": "School of Chemical and Materials Engineering (SCME)",
+      "location": "Islamabad, Pakistan",
+      "duration": "November 2021 – June 2025",
+      "period": "2021 – 2025",
+      "cgpa": "3.53",
+      "maxCgpa": "4.00",
+      "distinction": "Gold Medalist",
+      "honors": [
+        "Rector's Gold Medalist",
+        "Dean's List (2021–2025)"
+      ],
+      "thesisOrCapstone": "Specialized in process systems, sustainability, and plant engineering; awarded Rector's Gold Medal for top Final Year Project.",
+      "coreDisciplines": [
+        "Chemical Process Design & Simulation",
+        "Thermodynamics & Reaction Kinetics",
+        "Heat & Mass Transfer Operations",
+        "Process Dynamics & Plant Safety",
+        "Environmental Engineering & Sustainability",
+        "Industrial Material & Energy Balances"
+      ],
+      "verified": true
+    }
+  ],
+  "academicAchievements": [
+    {
+      "id": "achieve-gold-medal",
+      "title": "Rector's Gold Medalist",
+      "institution": "National University of Sciences and Technology (NUST)",
+      "year": "2025",
+      "period": "Graduation Distinction",
+      "badge": "Highest Academic Honor",
+      "distinctionType": "gold-medal",
+      "description": "Conferred the Rector's Gold Medal for the best Final Year Project among the graduating Chemical Engineering batch, recognizing exceptional technical depth, engineering rigor, and plant simulation design.",
+      "verified": true
+    },
+    {
+      "id": "achieve-deans-list",
+      "title": "Dean's List",
+      "institution": "National University of Sciences and Technology (NUST)",
+      "year": "2021 – 2025",
+      "period": "Undergraduate Honor",
+      "badge": "Academic Merit",
+      "distinctionType": "deans-list",
+      "description": "Maintained sustained semester-by-semester academic distinction across the undergraduate degree program at NUST SCME, graduating with a 3.53 CGPA.",
+      "verified": true
+    }
+  ],
+  "skillCategories": [
+    {
+      "id": "cat-software",
+      "categoryName": "Software & Productivity",
+      "groupType": "technical",
+      "description": "Core productivity, documentation, and reporting tools",
+      "skills": [
+        {
+          "name": "Microsoft Office",
+          "proficiencyLevel": "Proficient",
+          "note": "Word, Excel, PowerPoint",
+          "description": "Advanced documentation, formula modeling, reporting, and presentations",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "id": "cat-analytics",
+      "categoryName": "Data & Analytics",
+      "groupType": "technical",
+      "description": "Business intelligence and data visualization",
+      "skills": [
+        {
+          "name": "Power BI",
+          "proficiencyLevel": "Basic",
+          "note": "Basic",
+          "description": "KPI dash-boarding, metrics visualization, and operational data tracking",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "id": "cat-enterprise",
+      "categoryName": "Enterprise & Project Management",
+      "groupType": "technical",
+      "description": "Industrial project tracking and enterprise systems",
+      "skills": [
+        {
+          "name": "SAP – PS Module",
+          "proficiencyLevel": "Basic",
+          "note": "Basic",
+          "description": "Project System module for tracking resource allocation and project structures",
+          "verified": true
+        },
+        {
+          "name": "PROAACT",
+          "proficiencyLevel": "Working Knowledge",
+          "note": "Root Cause Analysis",
+          "description": "Systematic incident investigation and root cause failure analysis methodology",
+          "verified": true
+        },
+        {
+          "name": "Primavera P6",
+          "proficiencyLevel": "Working Knowledge",
+          "note": "Project Tracking",
+          "description": "Baseline schedules, critical path tracking, and variance reporting",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "id": "cat-domains",
+      "categoryName": "Engineering & Strategic Specializations",
+      "groupType": "domain",
+      "description": "Core engineering, sustainability, and operational capabilities",
+      "skills": [
+        {
+          "name": "Chemical Engineering & Process Operations",
+          "verified": true
+        },
+        {
+          "name": "Circular Economy Frameworks",
+          "verified": true
+        },
+        {
+          "name": "Sustainability & ESG Compliance",
+          "verified": true
+        },
+        {
+          "name": "Responsible Supply Chain Governance",
+          "verified": true
+        },
+        {
+          "name": "Risk Assessment & Operational Compliance",
+          "verified": true
+        },
+        {
+          "name": "Business Operations & Commercial Monitoring",
+          "verified": true
+        }
+      ]
+    }
+  ],
+  "professionalSkills": [
+    {
+      "id": "prof-communication",
+      "title": "Effective Communication",
+      "category": "Professional Capability",
+      "description": "Articulating complex process engineering data, vendor sustainability audits, and cross-functional status reports with clarity to multidisciplinary technical teams and corporate management.",
+      "iconName": "MessageSquare",
+      "verified": true
+    },
+    {
+      "id": "prof-planning",
+      "title": "Planning & Organization",
+      "category": "Professional Capability",
+      "description": "Structuring critical-path project milestones in turnaround tie-ins, managing scheduled procurement deliverables, and tracking high-volume commercial fulfillment orders without disruption.",
+      "iconName": "CalendarCheck",
+      "verified": true
+    },
+    {
+      "id": "prof-leadership",
+      "title": "Value-Driven Leadership",
+      "category": "Professional Capability",
+      "description": "Directing technical student initiatives as AIChE Student Chapter Director, mobilizing community fundraisers, and advancing sustainable governance frameworks across diverse operating companies.",
+      "iconName": "Compass",
+      "verified": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "award-gold-medal",
+      "title": "Rector's Gold Medalist",
+      "institution": "National University of Sciences and Technology (NUST)",
+      "year": "2025",
+      "period": "2021 – 2025",
+      "badge": "Highest Academic Distinction",
+      "distinctionType": "gold-medal",
+      "description": "Awarded for the Best Final Year Project among the graduating Chemical Engineering batch at NUST.",
+      "verified": true
+    },
+    {
+      "id": "award-deans-list",
+      "title": "Dean's List",
+      "institution": "National University of Sciences and Technology (NUST)",
+      "year": "2021 – 2025",
+      "period": "2021 – 2025",
+      "badge": "Academic Merit",
+      "distinctionType": "deans-list",
+      "description": "Recognized on the Dean's List for consistent semester-by-semester academic excellence throughout the undergraduate degree.",
+      "verified": true
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-aspire",
+      "title": "Aspire Leaders Program",
+      "issuer": "Designed by Harvard Faculty",
+      "duration": "October – December 2026",
+      "period": "October–December 2026",
+      "status": "In Progress",
+      "badgeLabel": "In Progress",
+      "description": "Executive leadership and social impact development program curated by Harvard faculty, fostering cross-cultural collaboration, critical inquiry, and ethical leadership.",
+      "verified": true
+    },
+    {
+      "id": "cert-mckinsey",
+      "title": "McKinsey Forward Learner Program",
+      "issuer": "McKinsey & Company",
+      "duration": "October – December 2026",
+      "period": "October–December 2026",
+      "status": "In Progress",
+      "badgeLabel": "In Progress",
+      "description": "Foundational problem-solving and future-readiness curriculum by McKinsey & Company focused on structured thinking, digital fluency, and business communications.",
+      "verified": true
+    }
+  ],
+  "leadership": [
+    {
+      "id": "lead-aiche",
+      "role": "Director",
+      "organization": "AIChE NUST Student Chapter",
+      "duration": "October 2022 – October 2023",
+      "period": "2022 – 2023",
+      "responsibilities": [
+        "Led event planning and operational coordination for AIChE student chapter activities.",
+        "Organized 5+ technical and networking workshops connecting chemical engineering students with industry experts.",
+        "Facilitated academic-industrial interaction and knowledge transfer sessions for student cohorts."
+      ],
+      "achievements": [
+        "Successfully organized 5+ technical workshops and knowledge seminars",
+        "Coordinated student operations and logistical planning across campus"
+      ],
+      "verified": true
+    },
+    {
+      "id": "lead-nust-events",
+      "role": "Event Planner",
+      "organization": "National University of Sciences and Technology (NUST)",
+      "duration": "November 2022 – June 2025",
+      "period": "2022 – 2025",
+      "responsibilities": [
+        "Spearheaded university event planning, schedule coordination, and logistics management across campus departments.",
+        "Coordinated student committees to ensure disciplined event execution, guest management, and resource allocation.",
+        "Maintained structured operational protocols, timing schedules, and stakeholder communications throughout event lifecycles."
+      ],
+      "achievements": [
+        "Delivered multi-year event planning and coordination across campus functions",
+        "Ensured smooth schedule management and operational compliance for university gatherings"
+      ],
+      "verified": true
+    }
+  ],
+  "communityService": [
+    {
+      "id": "comm-nust-thar",
+      "title": "Community Service & Humanitarian Outreach",
+      "organization": "National University of Sciences and Technology (NUST)",
+      "duration": "March 2022 – January 2025",
+      "summary": "Dedicated community outreach addressing vital clean water access in arid regions, educational resource distribution, and local madrasa infrastructural support.",
+      "impactMetrics": [
+        {
+          "label": "Water Pump in Thar",
+          "value": "PKR 30,000",
+          "detail": "Funds raised for clean drinking water"
+        },
+        {
+          "label": "Holy Quran Distribution",
+          "value": "40 Copies",
+          "detail": "Distributed to madrasas and community"
+        },
+        {
+          "label": "Madrasa Infrastructure",
+          "value": "Tables Provided",
+          "detail": "Educational furniture for local classrooms"
+        }
+      ],
+      "activities": [
+        "Raised PKR 30,000 for a water pump in Thar to provide clean, accessible drinking water to underserved desert communities.",
+        "Distributed 40 copies of the Holy Quran to religious schools and local community members.",
+        "Provided educational tables to local madrasas to improve classroom infrastructure and student learning environments."
+      ],
+      "verified": true
+    }
+  ],
+  "navigationRoutes": [
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "Experience",
+      "href": "/experience"
+    },
+    {
+      "label": "Projects",
+      "href": "/projects"
+    },
+    {
+      "label": "Education",
+      "href": "/education"
+    },
+    {
+      "label": "Skills",
+      "href": "/skills"
+    },
+    {
+      "label": "Achievements",
+      "href": "/achievements"
+    },
+    {
+      "label": "Leadership",
+      "href": "/leadership"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    },
+    {
+      "label": "Admin",
+      "href": "/admin",
+      "isPrivate": true
+    }
+  ]
+}

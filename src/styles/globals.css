@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-primary: #090D12;
+  --background-secondary: #0F1720;
+  --background-tertiary: #15222E;
+  --accent-emerald: #10B981;
+  --accent-emerald-light: #34D399;
+  --accent-gold: #D4AF37;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  selection-background-color: #10B981;
+  selection-color: #090D12;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: #F8FAFC;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090D12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E2D3B;
+  border-radius: 4px;
+  border: 2px solid #090D12;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #10B981;
+}
+
+/* Subtle Emerald and Gold Accents */
+.emerald-gradient-text {
+  background: linear-gradient(135deg, #F8FAFC 0%, #34D399 70%, #10B981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #F8FAFC 20%, #F3E5AB 60%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism / Surface accents */
+.surface-card {
+  background-color: rgba(15, 23, 32, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.surface-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.surface-card-hover:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px -3px rgba(16, 185, 129, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Accessibility: Universal Visible Focus Indicator */
+:focus-visible {
+  outline: 2px solid #10B981 !important;
+  outline-offset: 3px !important;
+}
+
+/* Accessibility: Support for Reduced Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
