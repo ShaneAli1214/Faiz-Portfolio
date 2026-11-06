@@ -42,13 +42,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
   const {
     profile,
     careerJourney,
     professionalInterests,
     professionalValues,
-  } = PortfolioService.getPortfolioData();
+  } = await PortfolioService.getPortfolioDataAsync();
 
   const valueIcons = [
     <Brain key="brain" className="h-5 w-5 text-accent-emerald" />,

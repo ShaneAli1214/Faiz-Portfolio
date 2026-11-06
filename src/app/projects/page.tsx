@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProjectsPage() {
-  const projects = PortfolioService.getProjects();
+export default async function ProjectsPage() {
+  const { projects } = await PortfolioService.getPortfolioDataAsync();
 
   const featuredAcademic =
     projects.find((p) => p.isFeaturedAcademic) || projects[0];

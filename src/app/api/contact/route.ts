@@ -9,7 +9,25 @@ const INQUIRIES_FILE_PATH = path.join(process.cwd(), "src", "data", "inquiries.j
 /**
  * Helper to safely read existing inquiries
  */
-function getStoredInquiries(): ContactInquiry[] {
+async function getStoredInquiriesAsync(): Promise<ContactInquiry[]> {
+  try {
+    const { getStore } = await import("@netlify/blobs");
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    const store = siteID && token
+      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
+      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
+
+    if (store) {
+      const stored = await store.get("inquiries-list", { type: "json" });
+      if (Array.isArray(stored)) {
+        return stored as ContactInquiry[];
+      }
+    }
+  } catch {
+    // Blobs not available
+  }
+
   try {
     if (!fs.existsSync(INQUIRIES_FILE_PATH)) {
       return [];
@@ -25,23 +43,37 @@ function getStoredInquiries(): ContactInquiry[] {
 /**
  * Helper to safely save new inquiry
  */
-function saveInquiry(inquiry: ContactInquiry): boolean {
+async function saveInquiryAsync(inquiry: ContactInquiry): Promise<boolean> {
+  const inquiries = await getStoredInquiriesAsync();
+  inquiries.unshift(inquiry); // Add latest first
+
+  // 1. Netlify Blobs
   try {
-    const inquiries = getStoredInquiries();
-    inquiries.unshift(inquiry); // Add latest first
-    try {
-      const dir = path.dirname(INQUIRIES_FILE_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
-    } catch (fsErr: any) {
-      console.warn("Notice: Inquiries disk is read-only (EROFS):", fsErr?.message);
+    const { getStore } = await import("@netlify/blobs");
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    const store = siteID && token
+      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
+      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
+
+    if (store) {
+      await store.setJSON("inquiries-list", inquiries);
     }
+  } catch (err: any) {
+    console.warn("Notice: Netlify Blobs inquiries store not available:", err?.message);
+  }
+
+  // 2. Disk
+  try {
+    const dir = path.dirname(INQUIRIES_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
     return true;
-  } catch (err) {
-    console.error("Error saving inquiry:", err);
-    return false;
+  } catch (fsErr: any) {
+    console.warn("Notice: Inquiries disk is read-only (EROFS):", fsErr?.message);
+    return true;
   }
 }
 
@@ -90,7 +122,7 @@ export async function POST(request: Request) {
       errors.fullName = "Please enter your full name (minimum 2 characters).";
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+$/;
     if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
       errors.email = "Please enter a valid email address.";
     }
@@ -125,7 +157,7 @@ export async function POST(request: Request) {
       status: "unread",
     };
 
-    saveInquiry(newInquiry);
+    await saveInquiryAsync(newInquiry);
 
     // Also log in server console for diagnostic observability
     console.log(`[Contact Form Received] ID: ${inquiryId} From: ${newInquiry.fullName} <${newInquiry.email}> Subject: "${newInquiry.subject}"`);
@@ -164,4 +196,3 @@ export async function GET() {
     },
   });
 }
-

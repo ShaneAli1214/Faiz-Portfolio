@@ -37,9 +37,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EducationPage() {
-  const educationList = PortfolioService.getEducation();
-  const achievements = PortfolioService.getAcademicAchievements();
+export default async function EducationPage() {
+  const data = await PortfolioService.getPortfolioDataAsync();
+  const educationList = data.education;
+  const achievements = data.academicAchievements || [];
   const primaryEducation = educationList[0];
 
   return (

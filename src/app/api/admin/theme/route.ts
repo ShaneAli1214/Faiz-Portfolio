@@ -3,8 +3,12 @@ import { AdminAuth } from "@/lib/auth";
 import { ThemeService, ThemeConfig } from "@/lib/theme-service";
 
 export async function GET() {
-  const theme = ThemeService.getTheme();
-  return NextResponse.json(theme);
+  const theme = await ThemeService.getThemeAsync();
+  return NextResponse.json(theme, {
+    headers: {
+      "Cache-Control": "no-store, max-age=0, must-revalidate",
+    },
+  });
 }
 
 export async function PUT(req: NextRequest) {
@@ -14,7 +18,7 @@ export async function PUT(req: NextRequest) {
 
   try {
     const updatedTheme: ThemeConfig = await req.json();
-    const success = ThemeService.saveTheme(updatedTheme);
+    const success = await ThemeService.saveThemeAsync(updatedTheme);
 
     if (!success) {
       return NextResponse.json({ error: "Failed to save theme" }, { status: 500 });
@@ -39,7 +43,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     if (body.action === "reset") {
-      const resetTheme = ThemeService.resetToDefault();
+      const resetTheme = await ThemeService.resetToDefaultAsync();
       return NextResponse.json({
         success: true,
         message: "Theme reset to default successfully.",

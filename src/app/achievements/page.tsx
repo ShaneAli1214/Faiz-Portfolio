@@ -37,9 +37,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AchievementsPage() {
-  const awards = PortfolioService.getAwards();
-  const programs = PortfolioService.getCertifications();
+export default async function AchievementsPage() {
+  const data = await PortfolioService.getPortfolioDataAsync();
+  const awards = data.awards;
+  const programs = data.certifications;
 
   return (
     <PageContainer>

@@ -63,9 +63,72 @@ export class PortfolioService {
     return this.loadFromDisk();
   }
 
+  public static async getPortfolioDataAsync(): Promise<PortfolioData> {
+    // 1. Check Netlify Blobs if on Netlify
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-cms", siteID, token, consistency: "strong" })
+        : getStore({ name: "portfolio-cms", consistency: "strong" });
+
+      if (store) {
+        const stored = await store.get("portfolio-data", { type: "json" });
+        if (stored && stored.profile && stored.projects) {
+          this.data = stored as PortfolioData;
+          this.initialized = true;
+          return this.data;
+        }
+      }
+    } catch {
+      // Blobs not available (e.g. running in local development)
+    }
+
+    // 2. Fallback to local disk file or initial data
+    return this.loadFromDisk();
+  }
+
   public static savePortfolioData(updatedData: PortfolioData): boolean {
+    this.data = updatedData;
+    this.initialized = true;
+
+    if (typeof window === "undefined") {
+      try {
+        const dir = path.dirname(CMS_FILE_PATH);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
+      } catch (fsErr: any) {
+        console.warn("Notice: Disk is read-only (EROFS), portfolio data updated in memory:", fsErr?.message);
+      }
+    }
+    return true;
+  }
+
+  public static async savePortfolioDataAsync(updatedData: PortfolioData): Promise<boolean> {
     try {
       this.data = updatedData;
+      this.initialized = true;
+
+      // 1. Persist to Netlify Blobs if on Netlify
+      try {
+        const { getStore } = await import("@netlify/blobs");
+        const siteID = process.env.NETLIFY_SITE_ID;
+        const token = process.env.NETLIFY_AUTH_TOKEN;
+        const store = siteID && token
+          ? getStore({ name: "portfolio-cms", siteID, token, consistency: "strong" })
+          : getStore({ name: "portfolio-cms", consistency: "strong" });
+
+        if (store) {
+          await store.setJSON("portfolio-data", updatedData);
+        }
+      } catch (blobErr: any) {
+        console.warn("Notice: Netlify Blobs not available in current environment:", blobErr?.message);
+      }
+
+      // 2. Persist to local disk if filesystem is writable
       if (typeof window === "undefined") {
         try {
           const dir = path.dirname(CMS_FILE_PATH);
@@ -74,18 +137,23 @@ export class PortfolioService {
           }
           fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
         } catch (fsErr: any) {
-          console.warn("Notice: Disk is read-only (EROFS), portfolio data updated in memory:", fsErr?.message);
+          console.warn("Notice: Local filesystem is read-only (EROFS):", fsErr?.message);
         }
       }
+
       return true;
     } catch (err) {
-      console.error("Error saving portfolio data:", err);
+      console.error("Error in savePortfolioDataAsync:", err);
       return false;
     }
   }
 
   public static resetToDefault(): boolean {
     return this.savePortfolioData(initialPortfolioData);
+  }
+
+  public static async resetToDefaultAsync(): Promise<boolean> {
+    return this.savePortfolioDataAsync(initialPortfolioData);
   }
 
   public static getProfile(): ProfileInfo {

@@ -38,9 +38,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const { profile, highlights, experience, projects, education, professionalInterests } =
-    PortfolioService.getPortfolioData();
+    await PortfolioService.getPortfolioDataAsync();
 
   // Selected 3 experiences for homepage preview
   const previewExperiences = experience.filter((exp) =>

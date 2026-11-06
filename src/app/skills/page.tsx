@@ -41,8 +41,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SkillsPage() {
-  const categories = PortfolioService.getSkillCategories();
+export default async function SkillsPage() {
+  const data = await PortfolioService.getPortfolioDataAsync();
+  const categories = data.skillCategories;
   const professionalSkills = PortfolioService.getProfessionalSkills();
   const learningPrograms = PortfolioService.getCertifications();
 

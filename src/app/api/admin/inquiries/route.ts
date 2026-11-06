@@ -6,7 +6,25 @@ import { ContactInquiry } from "@/types/portfolio";
 
 const INQUIRIES_FILE_PATH = path.join(process.cwd(), "src", "data", "inquiries.json");
 
-function getStoredInquiries(): ContactInquiry[] {
+async function getStoredInquiriesAsync(): Promise<ContactInquiry[]> {
+  try {
+    const { getStore } = await import("@netlify/blobs");
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    const store = siteID && token
+      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
+      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
+
+    if (store) {
+      const stored = await store.get("inquiries-list", { type: "json" });
+      if (Array.isArray(stored)) {
+        return stored as ContactInquiry[];
+      }
+    }
+  } catch {
+    // Blobs not available
+  }
+
   try {
     if (!fs.existsSync(INQUIRIES_FILE_PATH)) {
       return [];
@@ -19,21 +37,34 @@ function getStoredInquiries(): ContactInquiry[] {
   }
 }
 
-function writeStoredInquiries(inquiries: ContactInquiry[]): boolean {
+async function writeStoredInquiriesAsync(inquiries: ContactInquiry[]): Promise<boolean> {
+  // 1. Netlify Blobs
   try {
-    try {
-      const dir = path.dirname(INQUIRIES_FILE_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
-    } catch (fsErr: any) {
-      console.warn("Notice: Inquiries disk is read-only (EROFS):", fsErr?.message);
+    const { getStore } = await import("@netlify/blobs");
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    const store = siteID && token
+      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
+      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
+
+    if (store) {
+      await store.setJSON("inquiries-list", inquiries);
     }
+  } catch (err: any) {
+    console.warn("Notice: Netlify Blobs inquiries store not available:", err?.message);
+  }
+
+  // 2. Disk
+  try {
+    const dir = path.dirname(INQUIRIES_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
     return true;
-  } catch (err) {
-    console.error("Error saving inquiries:", err);
-    return false;
+  } catch (fsErr: any) {
+    console.warn("Notice: Inquiries disk is read-only (EROFS):", fsErr?.message);
+    return true;
   }
 }
 
@@ -42,8 +73,12 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
-  const inquiries = getStoredInquiries();
-  return NextResponse.json(inquiries);
+  const inquiries = await getStoredInquiriesAsync();
+  return NextResponse.json(inquiries, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+    },
+  });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -57,14 +92,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const inquiries = getStoredInquiries();
+    const inquiries = await getStoredInquiriesAsync();
     const target = inquiries.find((i) => i.id === id);
     if (!target) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
     target.status = status;
-    writeStoredInquiries(inquiries);
+    await writeStoredInquiriesAsync(inquiries);
 
     return NextResponse.json({
       success: true,
@@ -95,14 +130,14 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Inquiry ID required" }, { status: 400 });
     }
 
-    const inquiries = getStoredInquiries();
+    const inquiries = await getStoredInquiriesAsync();
     const filtered = inquiries.filter((i) => i.id !== id);
 
     if (filtered.length === inquiries.length) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
-    writeStoredInquiries(filtered);
+    await writeStoredInquiriesAsync(filtered);
 
     return NextResponse.json({
       success: true,
@@ -113,4 +148,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Failed to delete inquiry." }, { status: 500 });
   }
 }
-

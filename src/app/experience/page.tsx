@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ExperiencePage() {
-  const experience = PortfolioService.getExperience();
+export default async function ExperiencePage() {
+  const { experience } = await PortfolioService.getPortfolioDataAsync();
 
   return (
     <div className="flex flex-col w-full">

@@ -33,6 +33,7 @@ import {
   ImageFitMode,
   ImageAspectRatio,
 } from "@/types/portfolio";
+import { cn } from "@/lib/utils";
 import { AdaptiveImageFrame } from "@/components/ui/AdaptiveImageFrame";
 
 interface AdminMediaViewProps {
@@ -291,6 +292,31 @@ export function AdminMediaView({
     onCopyUrl(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  const handleSetAsHomeHero = async (itemUrl: string) => {
+    const updated: PlacementImageSettings = {
+      ...(homeSettings || defaultHomeSettings),
+      url: itemUrl,
+      originalUrl: itemUrl,
+    };
+    setHomeSettings(updated);
+    await onSaveProfileImages({
+      homeHeroImage: updated,
+      photoUrl: itemUrl,
+    });
+  };
+
+  const handleSetAsAboutProfile = async (itemUrl: string) => {
+    const updated: PlacementImageSettings = {
+      ...(aboutSettings || defaultAboutSettings),
+      url: itemUrl,
+      originalUrl: itemUrl,
+    };
+    setAboutSettings(updated);
+    await onSaveProfileImages({
+      aboutProfileImage: updated,
+    });
   };
 
   return (
@@ -786,7 +812,40 @@ export function AdminMediaView({
                         </p>
                       </div>
 
-                      <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-1">
+                      {/* Quick Placement Action Buttons */}
+                      <div className="pt-2 border-t border-border-subtle grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSetAsHomeHero(item.url)}
+                          className={cn(
+                            "px-2 py-1 rounded-md text-[10px] font-semibold flex items-center justify-center gap-1 transition-all",
+                            isHome
+                              ? "bg-accent-emerald text-background shadow-sm"
+                              : "bg-surface-hover text-content-secondary hover:text-accent-emerald hover:border-accent-emerald/40 border border-border-subtle"
+                          )}
+                          title="Set as Home Hero Image"
+                        >
+                          {isHome ? <Check className="h-3 w-3" /> : null}
+                          <span>{isHome ? "Active Hero" : "Use Hero"}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSetAsAboutProfile(item.url)}
+                          className={cn(
+                            "px-2 py-1 rounded-md text-[10px] font-semibold flex items-center justify-center gap-1 transition-all",
+                            isAbout
+                              ? "bg-accent-gold text-background shadow-sm"
+                              : "bg-surface-hover text-content-secondary hover:text-accent-gold hover:border-accent-gold/40 border border-border-subtle"
+                          )}
+                          title="Set as About Profile Image"
+                        >
+                          {isAbout ? <Check className="h-3 w-3" /> : null}
+                          <span>{isAbout ? "Active Profile" : "Use Profile"}</span>
+                        </button>
+                      </div>
+
+                      <div className="pt-1.5 flex items-center justify-between gap-1">
                         <button
                           type="button"
                           onClick={() => handleCopy(item.id, item.url)}

@@ -37,8 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage() {
-  const contactInfo = PortfolioService.getContactInfo();
+export default async function ContactPage() {
+  const data = await PortfolioService.getPortfolioDataAsync();
+  const contactInfo = data.profile.contact;
 
   return (
     <PageContainer>

@@ -7,8 +7,12 @@ const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function GET() {
-  const list = MediaService.getMediaList();
-  return NextResponse.json(list);
+  const list = await MediaService.getMediaListAsync();
+  return NextResponse.json(list, {
+    headers: {
+      "Cache-Control": "no-store, max-age=0, must-revalidate",
+    },
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -58,7 +62,7 @@ export async function POST(req: NextRequest) {
         : "general",
     };
 
-    MediaService.addMediaItem(newMedia);
+    await MediaService.addMediaItemAsync(newMedia);
 
     return NextResponse.json({
       success: true,
@@ -93,7 +97,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Media ID required" }, { status: 400 });
     }
 
-    const success = MediaService.deleteMediaItem(id);
+    const success = await MediaService.deleteMediaItemAsync(id);
     if (!success) {
       return NextResponse.json({ error: "Failed to delete media or media not found" }, { status: 404 });
     }

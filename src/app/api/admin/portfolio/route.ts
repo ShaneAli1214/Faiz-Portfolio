@@ -5,8 +5,12 @@ import { PortfolioData } from "@/types/portfolio";
 
 export async function GET() {
   try {
-    const data = PortfolioService.getPortfolioData();
-    return NextResponse.json(data);
+    const data = await PortfolioService.getPortfolioDataAsync();
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      },
+    });
   } catch (error) {
     console.error("Error fetching portfolio data:", error);
     return NextResponse.json(
@@ -31,10 +35,10 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const saved = PortfolioService.savePortfolioData(updatedData);
+    const saved = await PortfolioService.savePortfolioDataAsync(updatedData);
     if (!saved) {
       return NextResponse.json(
-        { error: "Failed to write changes to disk." },
+        { error: "Failed to write changes to persistent storage." },
         { status: 500 }
       );
     }
@@ -62,14 +66,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (body.action === "reset") {
-      const resetSuccess = PortfolioService.resetToDefault();
+      const resetSuccess = await PortfolioService.resetToDefaultAsync();
       if (!resetSuccess) {
         return NextResponse.json({ error: "Failed to reset portfolio" }, { status: 500 });
       }
+      const data = await PortfolioService.getPortfolioDataAsync();
       return NextResponse.json({
         success: true,
         message: "Portfolio successfully reset to verified default data.",
-        data: PortfolioService.getPortfolioData(),
+        data,
       });
     }
 
@@ -77,14 +82,15 @@ export async function POST(req: NextRequest) {
       if (!body.data || typeof body.data !== "object") {
         return NextResponse.json({ error: "No valid JSON data provided for import." }, { status: 400 });
       }
-      const saved = PortfolioService.savePortfolioData(body.data);
+      const saved = await PortfolioService.savePortfolioDataAsync(body.data);
       if (!saved) {
         return NextResponse.json({ error: "Failed to import portfolio data" }, { status: 500 });
       }
+      const data = await PortfolioService.getPortfolioDataAsync();
       return NextResponse.json({
         success: true,
         message: "Backup successfully imported.",
-        data: PortfolioService.getPortfolioData(),
+        data,
       });
     }
 

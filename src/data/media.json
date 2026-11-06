@@ -1,11 +1,11 @@
 [
   {
-    "id": "media-1793998110554-73qa1",
-    "name": "test-hero-headshot.jpeg",
-    "url": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
+    "id": "media-1793976076109-wvmof",
+    "name": "WhatsApp Image 2026-11-06 at 5.13.53 PM.jpeg",
+    "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
     "size": 157849,
     "type": "image/jpeg",
-    "uploadedAt": "2026-11-06T20:48:30.561Z",
+    "uploadedAt": "2026-11-06T14:41:16.115Z",
     "category": "profile"
   },
   {
@@ -16,14 +16,5 @@
     "type": "image/jpeg",
     "uploadedAt": "2026-11-06T16:13:50.557Z",
     "category": "project"
-  },
-  {
-    "id": "media-1793976076109-wvmof",
-    "name": "WhatsApp Image 2026-11-06 at 5.13.53 PM.jpeg",
-    "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
-    "size": 157849,
-    "type": "image/jpeg",
-    "uploadedAt": "2026-11-06T14:41:16.115Z",
-    "category": "profile"
   }
 ]

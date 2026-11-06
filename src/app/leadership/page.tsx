@@ -37,9 +37,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LeadershipPage() {
-  const leadershipRoles = PortfolioService.getLeadership();
-  const communityInitiatives = PortfolioService.getCommunityService();
+export default async function LeadershipPage() {
+  const data = await PortfolioService.getPortfolioDataAsync();
+  const leadershipRoles = data.leadership;
+  const communityInitiatives = data.communityService || [];
 
   return (
     <PageContainer>

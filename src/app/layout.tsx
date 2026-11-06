@@ -79,12 +79,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const currentTheme = ThemeService.getTheme();
+  const currentTheme = await ThemeService.getThemeAsync();
 
   return (
     <html lang="en" suppressHydrationWarning className={`dark ${inter.variable}`}>

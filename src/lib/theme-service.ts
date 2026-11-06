@@ -10,7 +10,7 @@ export class ThemeService {
   private static cachedTheme: ThemeConfig | null = null;
 
   public static getTheme(): ThemeConfig {
-    if (typeof window !== "undefined" && this.cachedTheme) {
+    if (this.cachedTheme) {
       return this.cachedTheme;
     }
 
@@ -38,25 +38,72 @@ export class ThemeService {
     }
   }
 
-  public static saveTheme(newTheme: ThemeConfig): boolean {
+  public static async getThemeAsync(): Promise<ThemeConfig> {
     try {
-      this.cachedTheme = newTheme;
-      try {
-        const dir = path.dirname(THEME_FILE_PATH);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
-      } catch (fsErr: any) {
-        console.warn("Notice: Disk is read-only (EROFS), theme updated in memory:", fsErr?.message);
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-theme", siteID, token, consistency: "strong" })
+        : getStore({ name: "portfolio-theme", consistency: "strong" });
+
+      if (store) {
+        const stored = await store.get("theme-data", { type: "json" });
+        if (stored && stored.primaryColor) {
+          this.cachedTheme = stored as ThemeConfig;
+          return this.cachedTheme;
+        }
       }
-      return true;
-    } catch (err) {
-      console.error("Error writing theme.json:", err);
-      return false;
+    } catch {
+      // Blobs not available
     }
+
+    return this.getTheme();
+  }
+
+  public static saveTheme(newTheme: ThemeConfig): boolean {
+    this.cachedTheme = newTheme;
+    try {
+      const dir = path.dirname(THEME_FILE_PATH);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
+    } catch (fsErr: any) {
+      console.warn("Notice: Disk is read-only (EROFS), theme updated in memory:", fsErr?.message);
+    }
+    return true;
+  }
+
+  public static async saveThemeAsync(newTheme: ThemeConfig): Promise<boolean> {
+    this.cachedTheme = newTheme;
+
+    // 1. Save to Netlify Blobs
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-theme", siteID, token, consistency: "strong" })
+        : getStore({ name: "portfolio-theme", consistency: "strong" });
+
+      if (store) {
+        await store.setJSON("theme-data", newTheme);
+      }
+    } catch (blobErr: any) {
+      console.warn("Notice: Netlify Blobs theme store not available:", blobErr?.message);
+    }
+
+    // 2. Save to local disk
+    this.saveTheme(newTheme);
+    return true;
   }
 
   public static resetToDefault(): ThemeConfig {
     this.saveTheme(defaultTheme);
+    return defaultTheme;
+  }
+
+  public static async resetToDefaultAsync(): Promise<ThemeConfig> {
+    await this.saveThemeAsync(defaultTheme);
     return defaultTheme;
   }
 }
