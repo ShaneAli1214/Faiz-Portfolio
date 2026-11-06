@@ -12,28 +12,30 @@
       "Rector's Gold Medalist",
       "Dean's List"
     ],
-    "photoUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
+    "photoUrl": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
     "homeHeroImage": {
-      "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
-      "originalUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
-      "scale": 1.0,
-      "positionX": 50,
-      "positionY": 20,
+      "url": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
+      "originalUrl": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
       "fitMode": "cover",
       "frameStyle": "auto",
-      "aspectRatio": "auto",
-      "maxWidth": "standard"
-    },
-    "aboutProfileImage": {
-      "url": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
-      "originalUrl": "/uploads/WhatsApp_Image_2026-11-06_at_5_13_53_PM-1793976076109-wvmof.jpeg",
-      "scale": 1.0,
+      "aspectRatio": "portrait",
+      "maxWidth": "standard",
+      "scale": 1,
       "positionX": 50,
       "positionY": 20,
-      "fitMode": "cover",
+      "hasBackgroundRemoved": false
+    },
+    "aboutProfileImage": {
+      "url": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
+      "originalUrl": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
+      "fitMode": "contain",
       "frameStyle": "editorial",
-      "aspectRatio": "auto",
-      "maxWidth": "standard"
+      "aspectRatio": "portrait",
+      "maxWidth": "standard",
+      "scale": 1.05,
+      "positionX": 50,
+      "positionY": 30,
+      "hasBackgroundRemoved": false
     },
     "contact": {
       "email": "faizwaheed9@gmail.com",

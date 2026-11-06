@@ -67,15 +67,19 @@ export class PortfolioService {
     try {
       this.data = updatedData;
       if (typeof window === "undefined") {
-        const dir = path.dirname(CMS_FILE_PATH);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
+        try {
+          const dir = path.dirname(CMS_FILE_PATH);
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
+          fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
+        } catch (fsErr: any) {
+          console.warn("Notice: Disk is read-only (EROFS), portfolio data updated in memory:", fsErr?.message);
         }
-        fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
       }
       return true;
     } catch (err) {
-      console.error("Error saving portfolio-cms.json:", err);
+      console.error("Error saving portfolio data:", err);
       return false;
     }
   }

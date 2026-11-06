@@ -1,5 +1,14 @@
 [
   {
+    "id": "media-1793998110554-73qa1",
+    "name": "test-hero-headshot.jpeg",
+    "url": "/uploads/test-hero-headshot-1793998110554-73qa1.jpeg",
+    "size": 157849,
+    "type": "image/jpeg",
+    "uploadedAt": "2026-11-06T20:48:30.561Z",
+    "category": "profile"
+  },
+  {
     "id": "media-1793981630479-h0m6e",
     "name": "img.jpeg",
     "url": "/uploads/img-1793981630479-h0m6e.jpeg",

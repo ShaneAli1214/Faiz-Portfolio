@@ -18,24 +18,22 @@ export class ThemeService {
       if (fs.existsSync(THEME_FILE_PATH)) {
         const raw = fs.readFileSync(THEME_FILE_PATH, "utf8");
         const parsed = JSON.parse(raw);
-        const combined: ThemeConfig = {
-          ...defaultTheme,
-          ...parsed,
-          dark: { ...defaultTheme.dark, ...(parsed.dark || {}) },
-          light: { ...defaultTheme.light, ...(parsed.light || {}) },
-          semantics: { ...defaultTheme.semantics, ...(parsed.semantics || {}) },
-        };
+        const combined: ThemeConfig = { ...defaultTheme, ...parsed };
         this.cachedTheme = combined;
         return combined;
       } else {
-        const dir = path.dirname(THEME_FILE_PATH);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(defaultTheme, null, 2), "utf8");
+        try {
+          const dir = path.dirname(THEME_FILE_PATH);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(defaultTheme, null, 2), "utf8");
+        } catch {
+          // Read-only filesystem
+        }
         this.cachedTheme = defaultTheme;
         return defaultTheme;
       }
     } catch (err) {
-      console.error("Error reading theme.json:", err);
+      console.warn("Error reading theme.json, using default:", err);
       return defaultTheme;
     }
   }
@@ -43,9 +41,13 @@ export class ThemeService {
   public static saveTheme(newTheme: ThemeConfig): boolean {
     try {
       this.cachedTheme = newTheme;
-      const dir = path.dirname(THEME_FILE_PATH);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
+      try {
+        const dir = path.dirname(THEME_FILE_PATH);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
+      } catch (fsErr: any) {
+        console.warn("Notice: Disk is read-only (EROFS), theme updated in memory:", fsErr?.message);
+      }
       return true;
     } catch (err) {
       console.error("Error writing theme.json:", err);

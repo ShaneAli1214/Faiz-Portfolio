@@ -203,9 +203,11 @@ export function AdminMediaView({
           URL.revokeObjectURL(uploadPreviewUrl);
           setUploadPreviewUrl(null);
         }
+      } else {
+        setErrorMessage("Upload could not be processed. Please try again or check storage settings.");
       }
-    } catch {
-      setErrorMessage("Upload failed. Please try again.");
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Upload failed. Please try again.");
     } finally {
       setIsUploading(false);
     }

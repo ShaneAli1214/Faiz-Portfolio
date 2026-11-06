@@ -3,7 +3,6 @@
 import React from "react";
 import { Menu, ExternalLink, ShieldCheck, Database, Sparkles } from "lucide-react";
 import { AdminSection } from "./AdminSidebar";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface AdminHeaderProps {
   activeSection: AdminSection;
@@ -124,9 +123,6 @@ export function AdminHeader({
             </span>
           )}
         </div>
-
-        {/* Theme Toggle */}
-        <ThemeToggle />
 
         {/* View Public Site */}
         <a

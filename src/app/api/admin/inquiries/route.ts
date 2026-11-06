@@ -21,11 +21,15 @@ function getStoredInquiries(): ContactInquiry[] {
 
 function writeStoredInquiries(inquiries: ContactInquiry[]): boolean {
   try {
-    const dir = path.dirname(INQUIRIES_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      const dir = path.dirname(INQUIRIES_FILE_PATH);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
+    } catch (fsErr: any) {
+      console.warn("Notice: Inquiries disk is read-only (EROFS):", fsErr?.message);
     }
-    fs.writeFileSync(INQUIRIES_FILE_PATH, JSON.stringify(inquiries, null, 2), "utf8");
     return true;
   } catch (err) {
     console.error("Error saving inquiries:", err);

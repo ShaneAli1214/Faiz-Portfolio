@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AdminAuth } from "@/lib/auth";
 import { MediaService, MediaItem } from "@/lib/media-service";
-import fs from "fs";
-import path from "path";
+import { StorageService } from "@/lib/storage-service";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: "Invalid file format. Please upload PNG, JPG, or WebP images." },
+        { error: `Invalid file format (${file.type}). Please upload PNG, JPG, or WebP images.` },
         { status: 400 }
       );
     }
@@ -41,30 +39,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure upload dir exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
-    // Generate safe unique filename
-    const ext = path.extname(file.name) || ".png";
-    const baseClean = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "_");
-    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    const finalFilename = `${baseClean}-${uniqueSuffix}${ext}`;
-    const destinationPath = path.join(UPLOAD_DIR, finalFilename);
-
-    // Convert file to Buffer and save
+    // Convert file to Buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    fs.writeFileSync(destinationPath, buffer);
 
-    const publicUrl = `/uploads/${finalFilename}`;
+    // Upload using StorageService (supports Cloudinary, Netlify Blobs, local disk, or resilient base64)
+    const uploadResult = await StorageService.uploadImage(buffer, file.name, file.type);
+
     const newMedia: MediaItem = {
-      id: `media-${uniqueSuffix}`,
-      name: file.name,
-      url: publicUrl,
-      size: file.size,
-      type: file.type,
+      id: uploadResult.id,
+      name: uploadResult.name,
+      url: uploadResult.url,
+      size: uploadResult.size,
+      type: uploadResult.mimeType,
       uploadedAt: new Date().toISOString(),
       category: ["profile", "project", "achievement", "general"].includes(category)
         ? category
@@ -75,12 +62,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Image uploaded successfully.",
+      message: `Image uploaded successfully via ${uploadResult.provider}.`,
       media: newMedia,
+      provider: uploadResult.provider,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Media upload error:", error);
-    return NextResponse.json({ error: "Failed to upload file." }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Failed to upload file to storage." },
+      { status: 500 }
+    );
   }
 }
 
