@@ -26,6 +26,7 @@ interface AdminGeneralViewProps {
   onImportJson: (imported: PortfolioData) => Promise<boolean>;
   onFactoryReset: () => Promise<void>;
   onConfirmReset: (message: string, onConfirm: () => void) => void;
+  onOpenPasswordModal?: () => void;
 }
 
 export function AdminGeneralView({
@@ -35,6 +36,7 @@ export function AdminGeneralView({
   onImportJson,
   onFactoryReset,
   onConfirmReset,
+  onOpenPasswordModal,
 }: AdminGeneralViewProps) {
   const { profile } = portfolioData;
   const [fullName, setFullName] = useState(profile.fullName);
@@ -239,6 +241,28 @@ export function AdminGeneralView({
               onChange={handleFileImport}
               className="hidden"
             />
+          </div>
+        </div>
+
+        {/* Security & Access Management */}
+        <div className="p-6 rounded-2xl bg-surface border border-border-muted space-y-4">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-content-primary flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-accent-emerald" />
+            Security &amp; Administrative Credentials
+          </h3>
+          <p className="text-xs text-content-secondary leading-relaxed">
+            Manage your administrative password. Credentials are cryptographically hashed using salted scrypt keys and stored securely in persistent storage.
+          </p>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onOpenPasswordModal}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-accent-emerald-light bg-accent-emerald/10 hover:bg-accent-emerald/20 border border-accent-emerald/30 transition-all shadow-sm"
+            >
+              <Settings className="h-4 w-4" />
+              <span>Change Administrator Password</span>
+            </button>
           </div>
         </div>
 

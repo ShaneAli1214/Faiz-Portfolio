@@ -23,11 +23,13 @@ import { AdminSeoView, SeoConfig } from "@/components/admin/AdminSeoView";
 import { AdminMessagesView } from "@/components/admin/AdminMessagesView";
 import { AdminConfirmModal } from "@/components/admin/AdminConfirmModal";
 import { AdminToast, ToastMessage } from "@/components/admin/AdminToast";
+import { AdminPasswordModal } from "@/components/admin/AdminPasswordModal";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   // Core Data States
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
@@ -449,6 +451,7 @@ export default function AdminPage() {
           onOpenMobile={() => setIsMobileOpen(true)}
           isSaving={isSaving}
           lastSavedAt={lastSavedAt}
+          onOpenPasswordModal={() => setIsPasswordModalOpen(true)}
         />
 
         {/* Content View Switcher */}
@@ -471,6 +474,7 @@ export default function AdminPage() {
               onExportJson={handleExportJson}
               onImportJson={handleImportJson}
               onFactoryReset={handleFactoryReset}
+              onOpenPasswordModal={() => setIsPasswordModalOpen(true)}
               onConfirmReset={(message, onConfirm) => {
                 setConfirmModal({
                   isOpen: true,
@@ -735,6 +739,13 @@ export default function AdminPage() {
         confirmText={confirmModal.confirmText}
         onConfirm={confirmModal.onConfirm}
         onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      {/* Password Management Modal */}
+      <AdminPasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSuccess={(msg) => addToast(msg, "success")}
       />
 
       {/* Toast Notification Container */}

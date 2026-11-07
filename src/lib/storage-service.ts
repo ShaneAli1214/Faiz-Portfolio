@@ -62,7 +62,12 @@ export class StorageService {
     // 2. Try Netlify Blobs if running on Netlify
     try {
       const { getStore } = await import("@netlify/blobs");
-      const store = getStore({ name: "portfolio-media", consistency: "strong" });
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-media", siteID, token, consistency: "strong" })
+        : getStore({ name: "portfolio-media", consistency: "strong" });
+
       if (store) {
         const arrayBuf = new Uint8Array(fileBuffer).buffer;
         await store.set(finalFilename, arrayBuf, {
@@ -179,7 +184,12 @@ export class StorageService {
   ): Promise<{ data: ArrayBuffer; contentType: string } | null> {
     try {
       const { getStore } = await import("@netlify/blobs");
-      const store = getStore({ name: "portfolio-media", consistency: "strong" });
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-media", siteID, token, consistency: "strong" })
+        : getStore({ name: "portfolio-media", consistency: "strong" });
+
       if (!store) return null;
 
       const blob = await store.getWithMetadata(key, { type: "arrayBuffer" });

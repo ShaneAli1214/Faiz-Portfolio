@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Menu, ExternalLink, ShieldCheck, Database, Sparkles } from "lucide-react";
+import { Menu, ExternalLink, ShieldCheck, Database, Sparkles, KeyRound } from "lucide-react";
 import { AdminSection } from "./AdminSidebar";
 
 interface AdminHeaderProps {
@@ -9,6 +9,7 @@ interface AdminHeaderProps {
   onOpenMobile: () => void;
   isSaving: boolean;
   lastSavedAt: string | null;
+  onOpenPasswordModal?: () => void;
 }
 
 const sectionTitles: Record<AdminSection, { title: string; subtitle: string }> = {
@@ -75,6 +76,7 @@ export function AdminHeader({
   onOpenMobile,
   isSaving,
   lastSavedAt,
+  onOpenPasswordModal,
 }: AdminHeaderProps) {
   const meta = sectionTitles[activeSection] || {
     title: "Portfolio Management",
@@ -123,6 +125,19 @@ export function AdminHeader({
             </span>
           )}
         </div>
+
+        {/* Security / Password Button */}
+        {onOpenPasswordModal && (
+          <button
+            type="button"
+            onClick={onOpenPasswordModal}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-accent-gold bg-accent-gold/10 hover:bg-accent-gold/20 border border-accent-gold/30 transition-all shadow-sm"
+            title="Change Admin Password"
+          >
+            <KeyRound className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Password</span>
+          </button>
+        )}
 
         {/* View Public Site */}
         <a
