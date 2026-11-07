@@ -189,3 +189,4 @@ export function AdminPasswordModal({ isOpen, onClose, onSuccess }: AdminPassword
     </div>
   );
 }
+
