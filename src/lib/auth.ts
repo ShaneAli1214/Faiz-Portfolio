@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { AdminAccount, SessionPayload } from "@/types/auth";
+import { withTimeout } from "@/lib/async-timeout";
 
 const AUTH_FILE_PATH = path.join(process.cwd(), "src", "data", "auth.json");
 const SESSION_COOKIE_NAME = "faiz_admin_session";
@@ -58,24 +59,39 @@ export class AdminAuth {
       return this.cachedAccount;
     }
 
-    // 1. Check Netlify Blobs
-    try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-auth", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-auth", consistency: "strong" });
+    // 1. Check Netlify Blobs with strict 800ms timeout
+    const hasNetlifyContext =
+      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
+      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
 
-      if (store) {
-        const stored = await store.get("admin-account", { type: "json" });
-        if (stored && (stored as AdminAccount).passwordHash) {
-          this.cachedAccount = stored as AdminAccount;
-          return this.cachedAccount;
-        }
+    if (hasNetlifyContext) {
+      await withTimeout(
+        async () => {
+          try {
+            const { getStore } = await import("@netlify/blobs");
+            const siteID = process.env.NETLIFY_SITE_ID;
+            const token = process.env.NETLIFY_AUTH_TOKEN;
+            const store = siteID && token
+              ? getStore({ name: "portfolio-auth", siteID, token })
+              : getStore({ name: "portfolio-auth" });
+
+            if (store) {
+              const stored = await store.get("admin-account", { type: "json" });
+              if (stored && (stored as AdminAccount).passwordHash) {
+                this.cachedAccount = stored as AdminAccount;
+              }
+            }
+          } catch {
+            // Blobs not available
+          }
+        },
+        800,
+        undefined
+      );
+
+      if (this.cachedAccount) {
+        return this.cachedAccount;
       }
-    } catch {
-      // Blobs not available
     }
 
     // 2. Check local auth.json
@@ -115,18 +131,24 @@ export class AdminAuth {
   public static async saveAccountAsync(account: AdminAccount): Promise<boolean> {
     this.cachedAccount = account;
 
-    // 1. Save to Netlify Blobs
+    // 1. Save to Netlify Blobs with strict timeout
     try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-auth", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-auth", consistency: "strong" });
+      const saveBlob = async () => {
+        const { getStore } = await import("@netlify/blobs");
+        const siteID = process.env.NETLIFY_SITE_ID;
+        const token = process.env.NETLIFY_AUTH_TOKEN;
+        const store = siteID && token
+          ? getStore({ name: "portfolio-auth", siteID, token })
+          : getStore({ name: "portfolio-auth" });
 
-      if (store) {
-        await store.setJSON("admin-account", account);
-      }
+        if (store) {
+          await store.setJSON("admin-account", account);
+          return true;
+        }
+        return false;
+      };
+
+      await withTimeout(saveBlob(), 2000, false);
     } catch (err: any) {
       console.warn("Notice: Netlify Blobs auth store not available:", err?.message);
     }

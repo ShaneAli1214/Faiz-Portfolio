@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { withTimeout } from "@/lib/async-timeout";
 
 export type StorageProvider = "cloudinary" | "netlify-blobs" | "local" | "base64";
 
@@ -61,37 +62,43 @@ export class StorageService {
 
     // 2. Try Netlify Blobs if running on Netlify
     try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-media", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-media", consistency: "strong" });
+      const netlifyUpload = async () => {
+        const { getStore } = await import("@netlify/blobs");
+        const siteID = process.env.NETLIFY_SITE_ID;
+        const token = process.env.NETLIFY_AUTH_TOKEN;
+        const store = siteID && token
+          ? getStore({ name: "portfolio-media", siteID, token })
+          : getStore({ name: "portfolio-media" });
 
-      if (store) {
-        const arrayBuf = new Uint8Array(fileBuffer).buffer;
-        await store.set(finalFilename, arrayBuf, {
-          metadata: {
-            contentType: mimeType,
-            originalName: fileName,
-            size: fileBuffer.length.toString(),
-            uploadedAt: new Date().toISOString(),
-          },
-        });
+        if (store) {
+          const arrayBuf = new Uint8Array(fileBuffer).buffer;
+          await store.set(finalFilename, arrayBuf, {
+            metadata: {
+              contentType: mimeType,
+              originalName: fileName,
+              size: fileBuffer.length.toString(),
+              uploadedAt: new Date().toISOString(),
+            },
+          });
 
-        // The image is served through the public Next.js API route
-        const publicUrl = `/api/media/${finalFilename}`;
-        return {
-          id,
-          name: fileName,
-          url: publicUrl,
-          provider: "netlify-blobs",
-          size: fileBuffer.length,
-          mimeType,
-        };
+          return {
+            id,
+            name: fileName,
+            url: `/api/media/${finalFilename}`,
+            provider: "netlify-blobs" as StorageProvider,
+            size: fileBuffer.length,
+            mimeType,
+          };
+        }
+        return null;
+      };
+
+      const result = await withTimeout(netlifyUpload(), 3000, null);
+      if (result) {
+        return result;
       }
     } catch {
-      // Netlify Blobs not available in this context (e.g. local dev without netlify link)
+      // Netlify Blobs not available in this context
     }
 
     // 3. Try Local Filesystem Storage (works on local dev / standard servers)
@@ -165,6 +172,7 @@ export class StorageService {
     const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: "POST",
       body: formData,
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {
@@ -183,23 +191,27 @@ export class StorageService {
     key: string
   ): Promise<{ data: ArrayBuffer; contentType: string } | null> {
     try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-media", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-media", consistency: "strong" });
+      const fetchBlob = async () => {
+        const { getStore } = await import("@netlify/blobs");
+        const siteID = process.env.NETLIFY_SITE_ID;
+        const token = process.env.NETLIFY_AUTH_TOKEN;
+        const store = siteID && token
+          ? getStore({ name: "portfolio-media", siteID, token })
+          : getStore({ name: "portfolio-media" });
 
-      if (!store) return null;
+        if (!store) return null;
 
-      const blob = await store.getWithMetadata(key, { type: "arrayBuffer" });
-      if (!blob || !blob.data) return null;
+        const blob = await store.getWithMetadata(key, { type: "arrayBuffer" });
+        if (!blob || !blob.data) return null;
 
-      const contentType = (blob.metadata as any)?.contentType || "image/jpeg";
-      return {
-        data: blob.data,
-        contentType,
+        const contentType = (blob.metadata as any)?.contentType || "image/jpeg";
+        return {
+          data: blob.data,
+          contentType,
+        };
       };
+
+      return await withTimeout(fetchBlob(), 2000, null);
     } catch {
       return null;
     }

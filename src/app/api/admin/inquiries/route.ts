@@ -3,53 +3,73 @@ import { AdminAuth } from "@/lib/auth";
 import fs from "fs";
 import path from "path";
 import { ContactInquiry } from "@/types/portfolio";
+import { withTimeout } from "@/lib/async-timeout";
 
 const INQUIRIES_FILE_PATH = path.join(process.cwd(), "src", "data", "inquiries.json");
 
-async function getStoredInquiriesAsync(): Promise<ContactInquiry[]> {
-  try {
-    const { getStore } = await import("@netlify/blobs");
-    const siteID = process.env.NETLIFY_SITE_ID;
-    const token = process.env.NETLIFY_AUTH_TOKEN;
-    const store = siteID && token
-      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
-      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
-
-    if (store) {
-      const stored = await store.get("inquiries-list", { type: "json" });
-      if (Array.isArray(stored)) {
-        return stored as ContactInquiry[];
-      }
-    }
-  } catch {
-    // Blobs not available
-  }
-
+function readDiskInquiries(): ContactInquiry[] {
   try {
     if (!fs.existsSync(INQUIRIES_FILE_PATH)) {
       return [];
     }
     const fileData = fs.readFileSync(INQUIRIES_FILE_PATH, "utf8");
     return JSON.parse(fileData) as ContactInquiry[];
-  } catch (err) {
-    console.error("Error reading inquiries file:", err);
+  } catch {
     return [];
   }
 }
 
-async function writeStoredInquiriesAsync(inquiries: ContactInquiry[]): Promise<boolean> {
-  // 1. Netlify Blobs
-  try {
-    const { getStore } = await import("@netlify/blobs");
-    const siteID = process.env.NETLIFY_SITE_ID;
-    const token = process.env.NETLIFY_AUTH_TOKEN;
-    const store = siteID && token
-      ? getStore({ name: "portfolio-inquiries", siteID, token, consistency: "strong" })
-      : getStore({ name: "portfolio-inquiries", consistency: "strong" });
+async function getStoredInquiriesAsync(): Promise<ContactInquiry[]> {
+  const diskFallback = readDiskInquiries();
 
-    if (store) {
-      await store.setJSON("inquiries-list", inquiries);
+  try {
+    const fetchBlobInquiries = async () => {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-inquiries", siteID, token })
+        : getStore({ name: "portfolio-inquiries" });
+
+      if (store) {
+        const stored = await store.get("inquiries-list", { type: "json" });
+        if (Array.isArray(stored)) {
+          return stored as ContactInquiry[];
+        }
+      }
+      return null;
+    };
+
+    const remote = await withTimeout(fetchBlobInquiries(), 800, null);
+    if (remote && Array.isArray(remote)) {
+      return remote;
     }
+  } catch {
+    // Blobs not available
+  }
+
+  return diskFallback;
+}
+
+async function writeStoredInquiriesAsync(inquiries: ContactInquiry[]): Promise<boolean> {
+  // 1. Netlify Blobs with strict timeout
+  try {
+    const saveBlob = async () => {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      const store = siteID && token
+        ? getStore({ name: "portfolio-inquiries", siteID, token })
+        : getStore({ name: "portfolio-inquiries" });
+
+      if (store) {
+        await store.setJSON("inquiries-list", inquiries);
+        return true;
+      }
+      return false;
+    };
+
+    await withTimeout(saveBlob(), 2000, false);
   } catch (err: any) {
     console.warn("Notice: Netlify Blobs inquiries store not available:", err?.message);
   }

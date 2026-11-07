@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ThemeConfig, defaultTheme } from "@/types/theme";
+import { withTimeout } from "@/lib/async-timeout";
 
 export { type ThemeConfig, defaultTheme };
 
@@ -21,44 +22,51 @@ export class ThemeService {
         const combined: ThemeConfig = { ...defaultTheme, ...parsed };
         this.cachedTheme = combined;
         return combined;
-      } else {
-        try {
-          const dir = path.dirname(THEME_FILE_PATH);
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-          fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(defaultTheme, null, 2), "utf8");
-        } catch {
-          // Read-only filesystem
-        }
-        this.cachedTheme = defaultTheme;
-        return defaultTheme;
       }
     } catch (err) {
-      console.warn("Error reading theme.json, using default:", err);
-      return defaultTheme;
+      console.warn("Notice reading theme.json fallback:", err);
     }
+
+    this.cachedTheme = defaultTheme;
+    return defaultTheme;
   }
 
   public static async getThemeAsync(): Promise<ThemeConfig> {
-    try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-theme", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-theme", consistency: "strong" });
+    const fallback = this.getTheme();
 
-      if (store) {
-        const stored = await store.get("theme-data", { type: "json" });
-        if (stored && stored.primaryColor) {
-          this.cachedTheme = stored as ThemeConfig;
-          return this.cachedTheme;
-        }
-      }
-    } catch {
-      // Blobs not available
+    const hasNetlifyContext =
+      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
+      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
+
+    if (!hasNetlifyContext) {
+      return fallback;
     }
 
-    return this.getTheme();
+    return withTimeout(
+      async () => {
+        try {
+          const { getStore } = await import("@netlify/blobs");
+          const siteID = process.env.NETLIFY_SITE_ID;
+          const token = process.env.NETLIFY_AUTH_TOKEN;
+          const store = siteID && token
+            ? getStore({ name: "portfolio-theme", siteID, token })
+            : getStore({ name: "portfolio-theme" });
+
+          if (store) {
+            const stored = await store.get("theme-data", { type: "json" });
+            if (stored && (stored as any).primaryColor) {
+              this.cachedTheme = stored as ThemeConfig;
+              return this.cachedTheme;
+            }
+          }
+        } catch {
+          // Blobs not available
+        }
+        return fallback;
+      },
+      600, // 600ms timeout max
+      fallback
+    );
   }
 
   public static saveTheme(newTheme: ThemeConfig): boolean {
@@ -76,21 +84,28 @@ export class ThemeService {
   public static async saveThemeAsync(newTheme: ThemeConfig): Promise<boolean> {
     this.cachedTheme = newTheme;
 
-    // 1. Save to Netlify Blobs
-    try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-theme", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-theme", consistency: "strong" });
+    // 1. Save to Netlify Blobs with timeout
+    await withTimeout(
+      async () => {
+        try {
+          const { getStore } = await import("@netlify/blobs");
+          const siteID = process.env.NETLIFY_SITE_ID;
+          const token = process.env.NETLIFY_AUTH_TOKEN;
+          const store = siteID && token
+            ? getStore({ name: "portfolio-theme", siteID, token })
+            : getStore({ name: "portfolio-theme" });
 
-      if (store) {
-        await store.setJSON("theme-data", newTheme);
-      }
-    } catch (blobErr: any) {
-      console.warn("Notice: Netlify Blobs theme store not available:", blobErr?.message);
-    }
+          if (store) {
+            await store.setJSON("theme-data", newTheme);
+          }
+        } catch (blobErr: any) {
+          console.warn("Notice: Netlify Blobs theme store error:", blobErr?.message);
+        }
+        return true;
+      },
+      2000,
+      false
+    );
 
     // 2. Save to local disk
     this.saveTheme(newTheme);

@@ -18,6 +18,7 @@ import {
   ProfessionalSkillItem,
   CommunityServiceItem,
 } from "@/types/portfolio";
+import { withTimeout } from "@/lib/async-timeout";
 import fs from "fs";
 import path from "path";
 
@@ -25,68 +26,87 @@ const CMS_FILE_PATH = path.join(process.cwd(), "src", "data", "portfolio-cms.jso
 
 /**
  * Portfolio Data Access Layer
- * Central service providing dynamic persistence via portfolio-cms.json
+ * Central service providing dynamic persistence via portfolio-cms.json with fast timeouts
  */
 export class PortfolioService {
   private static data: PortfolioData = initialPortfolioData;
   private static initialized: boolean = false;
 
   private static loadFromDisk(): PortfolioData {
-    if (typeof window !== "undefined") {
+    if (this.initialized && this.data && this.data.profile) {
       return this.data;
+    }
+
+    if (typeof window !== "undefined") {
+      return this.data || initialPortfolioData;
     }
 
     try {
       if (fs.existsSync(CMS_FILE_PATH)) {
         const fileContent = fs.readFileSync(CMS_FILE_PATH, "utf8");
-        this.data = JSON.parse(fileContent) as PortfolioData;
-        this.initialized = true;
-        return this.data;
-      } else {
-        // Initialize file from initialPortfolioData
-        this.data = initialPortfolioData;
-        const dir = path.dirname(CMS_FILE_PATH);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
+        const parsed = JSON.parse(fileContent) as PortfolioData;
+        if (parsed && parsed.profile) {
+          this.data = parsed;
+          this.initialized = true;
+          return this.data;
         }
-        fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(initialPortfolioData, null, 2), "utf8");
-        this.initialized = true;
-        return this.data;
       }
     } catch (err) {
-      console.error("Error reading portfolio-cms.json, using fallback:", err);
-      return this.data || initialPortfolioData;
+      console.warn("Notice: reading portfolio-cms.json fallback:", err);
     }
+
+    this.data = initialPortfolioData;
+    this.initialized = true;
+    return this.data;
   }
 
   public static getPortfolioData(): PortfolioData {
     return this.loadFromDisk();
   }
 
+  /**
+   * Asynchronously loads portfolio data with a strict 800ms timeout race.
+   * If Netlify Blobs does not respond within 800ms, immediately returns cached/local data.
+   * Guarantees zero "Inactivity Timeout" on Netlify.
+   */
   public static async getPortfolioDataAsync(): Promise<PortfolioData> {
-    // 1. Check Netlify Blobs if on Netlify
-    try {
-      const { getStore } = await import("@netlify/blobs");
-      const siteID = process.env.NETLIFY_SITE_ID;
-      const token = process.env.NETLIFY_AUTH_TOKEN;
-      const store = siteID && token
-        ? getStore({ name: "portfolio-cms", siteID, token, consistency: "strong" })
-        : getStore({ name: "portfolio-cms", consistency: "strong" });
+    const fallback = this.loadFromDisk();
 
-      if (store) {
-        const stored = await store.get("portfolio-data", { type: "json" });
-        if (stored && stored.profile && stored.projects) {
-          this.data = stored as PortfolioData;
-          this.initialized = true;
-          return this.data;
-        }
-      }
-    } catch {
-      // Blobs not available (e.g. running in local development)
+    // Only attempt Netlify Blobs if on Netlify or token configured
+    const hasNetlifyContext =
+      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
+      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
+
+    if (!hasNetlifyContext) {
+      return fallback;
     }
 
-    // 2. Fallback to local disk file or initial data
-    return this.loadFromDisk();
+    return withTimeout(
+      async () => {
+        try {
+          const { getStore } = await import("@netlify/blobs");
+          const siteID = process.env.NETLIFY_SITE_ID;
+          const token = process.env.NETLIFY_AUTH_TOKEN;
+          const store = siteID && token
+            ? getStore({ name: "portfolio-cms", siteID, token })
+            : getStore({ name: "portfolio-cms" });
+
+          if (store) {
+            const stored = await store.get("portfolio-data", { type: "json" });
+            if (stored && (stored as any).profile && (stored as any).projects) {
+              this.data = stored as PortfolioData;
+              this.initialized = true;
+              return this.data;
+            }
+          }
+        } catch {
+          // Blobs not available
+        }
+        return fallback;
+      },
+      800, // 800ms max timeout
+      fallback
+    );
   }
 
   public static savePortfolioData(updatedData: PortfolioData): boolean {
@@ -112,21 +132,28 @@ export class PortfolioService {
       this.data = updatedData;
       this.initialized = true;
 
-      // 1. Persist to Netlify Blobs if on Netlify
-      try {
-        const { getStore } = await import("@netlify/blobs");
-        const siteID = process.env.NETLIFY_SITE_ID;
-        const token = process.env.NETLIFY_AUTH_TOKEN;
-        const store = siteID && token
-          ? getStore({ name: "portfolio-cms", siteID, token, consistency: "strong" })
-          : getStore({ name: "portfolio-cms", consistency: "strong" });
+      // 1. Persist to Netlify Blobs with a strict 3000ms timeout
+      await withTimeout(
+        async () => {
+          try {
+            const { getStore } = await import("@netlify/blobs");
+            const siteID = process.env.NETLIFY_SITE_ID;
+            const token = process.env.NETLIFY_AUTH_TOKEN;
+            const store = siteID && token
+              ? getStore({ name: "portfolio-cms", siteID, token })
+              : getStore({ name: "portfolio-cms" });
 
-        if (store) {
-          await store.setJSON("portfolio-data", updatedData);
-        }
-      } catch (blobErr: any) {
-        console.warn("Notice: Netlify Blobs not available in current environment:", blobErr?.message);
-      }
+            if (store) {
+              await store.setJSON("portfolio-data", updatedData);
+            }
+          } catch (blobErr: any) {
+            console.warn("Notice: Netlify Blobs save notice:", blobErr?.message);
+          }
+          return true;
+        },
+        3000,
+        false
+      );
 
       // 2. Persist to local disk if filesystem is writable
       if (typeof window === "undefined") {
