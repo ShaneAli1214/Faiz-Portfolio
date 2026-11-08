@@ -1,7 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminAuth } from "@/lib/auth";
 import { PortfolioService } from "@/lib/portfolio-service";
 import { PortfolioData } from "@/types/portfolio";
+
+function purgePublicCaches() {
+  try {
+    revalidatePath("/", "layout");
+    revalidatePath("/");
+    revalidatePath("/about");
+    revalidatePath("/experience");
+    revalidatePath("/projects");
+    revalidatePath("/education");
+    revalidatePath("/skills");
+    revalidatePath("/achievements");
+    revalidatePath("/leadership");
+    revalidatePath("/contact");
+  } catch (err) {
+    console.warn("Notice: Next.js revalidatePath:", err);
+  }
+}
 
 export async function GET() {
   try {
@@ -22,7 +40,7 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   if (!AdminAuth.isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized access: Please log in as administrator." }, { status: 401 });
   }
 
   try {
@@ -35,17 +53,19 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const saved = await PortfolioService.savePortfolioDataAsync(updatedData);
-    if (!saved) {
+    const saveResult = await PortfolioService.savePortfolioDataAsync(updatedData);
+    if (!saveResult.success) {
       return NextResponse.json(
-        { error: "Failed to write changes to persistent storage." },
+        { error: saveResult.error || "Failed to write changes to persistent storage." },
         { status: 500 }
       );
     }
 
+    purgePublicCaches();
+
     return NextResponse.json({
       success: true,
-      message: "Portfolio data successfully saved to persistent storage.",
+      message: "Portfolio data successfully saved to persistent storage and published live.",
       data: updatedData,
     });
   } catch (error) {
@@ -59,7 +79,7 @@ export async function PUT(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!AdminAuth.isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized access: Please log in as administrator." }, { status: 401 });
   }
 
   try {
@@ -70,6 +90,7 @@ export async function POST(req: NextRequest) {
       if (!resetSuccess) {
         return NextResponse.json({ error: "Failed to reset portfolio" }, { status: 500 });
       }
+      purgePublicCaches();
       const data = await PortfolioService.getPortfolioDataAsync();
       return NextResponse.json({
         success: true,
@@ -82,14 +103,15 @@ export async function POST(req: NextRequest) {
       if (!body.data || typeof body.data !== "object") {
         return NextResponse.json({ error: "No valid JSON data provided for import." }, { status: 400 });
       }
-      const saved = await PortfolioService.savePortfolioDataAsync(body.data);
-      if (!saved) {
-        return NextResponse.json({ error: "Failed to import portfolio data" }, { status: 500 });
+      const saveResult = await PortfolioService.savePortfolioDataAsync(body.data);
+      if (!saveResult.success) {
+        return NextResponse.json({ error: saveResult.error || "Failed to import portfolio data" }, { status: 500 });
       }
+      purgePublicCaches();
       const data = await PortfolioService.getPortfolioDataAsync();
       return NextResponse.json({
         success: true,
-        message: "Backup successfully imported.",
+        message: "Backup successfully imported and published live.",
         data,
       });
     }
@@ -103,4 +125,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

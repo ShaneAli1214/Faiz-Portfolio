@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminAuth } from "@/lib/auth";
 import { MediaService, MediaItem } from "@/lib/media-service";
 import { StorageService } from "@/lib/storage-service";
@@ -64,6 +65,11 @@ export async function POST(req: NextRequest) {
 
     await MediaService.addMediaItemAsync(newMedia);
 
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/");
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: `Image uploaded successfully via ${uploadResult.provider}.`,
@@ -101,6 +107,11 @@ export async function DELETE(req: NextRequest) {
     if (!success) {
       return NextResponse.json({ error: "Failed to delete media or media not found" }, { status: 404 });
     }
+
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/");
+    } catch {}
 
     return NextResponse.json({
       success: true,

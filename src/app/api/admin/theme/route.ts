@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminAuth } from "@/lib/auth";
 import { ThemeService, ThemeConfig } from "@/lib/theme-service";
 
@@ -13,20 +14,27 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   if (!AdminAuth.isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized access: Please log in as administrator." }, { status: 401 });
   }
 
   try {
     const updatedTheme: ThemeConfig = await req.json();
-    const success = await ThemeService.saveThemeAsync(updatedTheme);
+    const result = await ThemeService.saveThemeAsync(updatedTheme);
 
-    if (!success) {
-      return NextResponse.json({ error: "Failed to save theme" }, { status: 500 });
+    if (!result.success) {
+      return NextResponse.json({ error: result.error || "Failed to save theme" }, { status: 500 });
+    }
+
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/");
+    } catch (revalErr) {
+      console.warn("Theme revalidate notice:", revalErr);
     }
 
     return NextResponse.json({
       success: true,
-      message: "Theme settings updated successfully.",
+      message: "Theme settings updated successfully and published live.",
       theme: updatedTheme,
     });
   } catch (error) {
@@ -37,16 +45,19 @@ export async function PUT(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!AdminAuth.isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized access: Please log in as administrator." }, { status: 401 });
   }
 
   try {
     const body = await req.json();
     if (body.action === "reset") {
       const resetTheme = await ThemeService.resetToDefaultAsync();
+      try {
+        revalidatePath("/", "layout");
+      } catch {}
       return NextResponse.json({
         success: true,
-        message: "Theme reset to default successfully.",
+        message: "Theme reset to default successfully and published live.",
         theme: resetTheme,
       });
     }
@@ -57,4 +68,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to process theme action" }, { status: 500 });
   }
 }
-

@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
     // 3. Reset failed attempts on success
     await AdminAuth.recordSuccessfulLoginAsync();
 
-    // 4. Create signed session token
-    const token = AdminAuth.createSessionToken(account.username, account.mustChangePassword);
+    // 4. Create signed session token with current session version
+    const token = AdminAuth.createSessionToken(account.username, account.mustChangePassword, account.sessionVersion || 1);
 
     const response = NextResponse.json({
       success: true,

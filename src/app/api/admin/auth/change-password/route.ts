@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Refresh session cookie with mustChangePassword = false
+    // Refresh session cookie with mustChangePassword = false and updated sessionVersion
     const account = await AdminAuth.getAccountAsync();
-    const token = AdminAuth.createSessionToken(account.username, false);
+    const token = AdminAuth.createSessionToken(account.username, false, account.sessionVersion || 1);
 
     const response = NextResponse.json({
       success: true,

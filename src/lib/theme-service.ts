@@ -10,18 +10,45 @@ const THEME_FILE_PATH = path.join(process.cwd(), "src", "data", "theme.json");
 export class ThemeService {
   private static cachedTheme: ThemeConfig | null = null;
 
+  private static async getNetlifyStore() {
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      if (siteID && token) {
+        return getStore({ name: "portfolio-theme", siteID, token });
+      }
+      return getStore({ name: "portfolio-theme" });
+    } catch {
+      return null;
+    }
+  }
+
   public static getTheme(): ThemeConfig {
     if (this.cachedTheme) {
       return this.cachedTheme;
     }
 
+    // 1. Check /tmp on serverless container
+    try {
+      const tmpPath = path.join("/tmp", "theme.json");
+      if (fs.existsSync(tmpPath)) {
+        const raw = fs.readFileSync(tmpPath, "utf8");
+        const parsed = JSON.parse(raw);
+        const config: ThemeConfig = { ...defaultTheme, ...parsed };
+        this.cachedTheme = config;
+        return config;
+      }
+    } catch {}
+
+    // 2. Check repo theme.json
     try {
       if (fs.existsSync(THEME_FILE_PATH)) {
         const raw = fs.readFileSync(THEME_FILE_PATH, "utf8");
         const parsed = JSON.parse(raw);
-        const combined: ThemeConfig = { ...defaultTheme, ...parsed };
-        this.cachedTheme = combined;
-        return combined;
+        const config: ThemeConfig = { ...defaultTheme, ...parsed };
+        this.cachedTheme = config;
+        return config;
       }
     } catch (err) {
       console.warn("Notice reading theme.json fallback:", err);
@@ -34,24 +61,15 @@ export class ThemeService {
   public static async getThemeAsync(): Promise<ThemeConfig> {
     const fallback = this.getTheme();
 
-    const hasNetlifyContext =
-      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
-      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
-
-    if (!hasNetlifyContext) {
+    const mayHaveBlobs = Boolean(process.env.NETLIFY || process.env.NETLIFY_SITE_ID);
+    if (!mayHaveBlobs) {
       return fallback;
     }
 
     return withTimeout(
       async () => {
         try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-theme", siteID, token })
-            : getStore({ name: "portfolio-theme" });
-
+          const store = await this.getNetlifyStore();
           if (store) {
             const stored = await store.get("theme-data", { type: "json" });
             if (stored && (stored as any).primaryColor) {
@@ -76,40 +94,68 @@ export class ThemeService {
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
     } catch (fsErr: any) {
-      console.warn("Notice: Disk is read-only (EROFS), theme updated in memory:", fsErr?.message);
+      try {
+        const tmpFile = path.join("/tmp", "theme.json");
+        fs.writeFileSync(tmpFile, JSON.stringify(newTheme, null, 2), "utf8");
+      } catch {}
     }
     return true;
   }
 
-  public static async saveThemeAsync(newTheme: ThemeConfig): Promise<boolean> {
+  public static async saveThemeAsync(newTheme: ThemeConfig): Promise<{ success: boolean; error?: string }> {
     this.cachedTheme = newTheme;
+    const isNetlifyEnv = Boolean(process.env.NETLIFY);
+    let cloudPersisted = false;
+    let cloudError: string | null = null;
 
     // 1. Save to Netlify Blobs with timeout
-    await withTimeout(
-      async () => {
-        try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-theme", siteID, token })
-            : getStore({ name: "portfolio-theme" });
-
-          if (store) {
-            await store.setJSON("theme-data", newTheme);
-          }
-        } catch (blobErr: any) {
-          console.warn("Notice: Netlify Blobs theme store error:", blobErr?.message);
+    try {
+      const store = await this.getNetlifyStore();
+      if (store) {
+        const writeBlob = async () => {
+          await store.setJSON("theme-data", newTheme);
+          return true;
+        };
+        cloudPersisted = await withTimeout(writeBlob(), 3000, false);
+        if (!cloudPersisted) {
+          cloudError = "Netlify Blobs write timed out or could not be completed.";
         }
-        return true;
-      },
-      2000,
-      false
-    );
+      } else {
+        cloudError = "Netlify Blobs store uninitialized.";
+      }
+    } catch (blobErr: any) {
+      cloudError = blobErr?.message || "Netlify Blobs theme store error.";
+    }
 
     // 2. Save to local disk
-    this.saveTheme(newTheme);
-    return true;
+    let diskPersisted = false;
+    try {
+      const dir = path.dirname(THEME_FILE_PATH);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(THEME_FILE_PATH, JSON.stringify(newTheme, null, 2), "utf8");
+      diskPersisted = true;
+    } catch (fsErr: any) {
+      try {
+        const tmpFile = path.join("/tmp", "theme.json");
+        fs.writeFileSync(tmpFile, JSON.stringify(newTheme, null, 2), "utf8");
+      } catch {}
+    }
+
+    if (isNetlifyEnv && !cloudPersisted) {
+      return {
+        success: false,
+        error: `Cloud storage failed to persist theme: ${cloudError || "Netlify Blobs unavailable."} Please ensure NETLIFY_SITE_ID and NETLIFY_AUTH_TOKEN are set in Netlify Site Settings > Environment Variables.`,
+      };
+    }
+
+    if (!isNetlifyEnv && !diskPersisted && !cloudPersisted) {
+      return {
+        success: false,
+        error: "Failed to persist theme to local disk or cloud storage.",
+      };
+    }
+
+    return { success: true };
   }
 
   public static resetToDefault(): ThemeConfig {

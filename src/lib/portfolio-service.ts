@@ -26,7 +26,7 @@ const CMS_FILE_PATH = path.join(process.cwd(), "src", "data", "portfolio-cms.jso
 
 /**
  * Portfolio Data Access Layer
- * Central service providing dynamic persistence via portfolio-cms.json with fast timeouts
+ * Central service providing dynamic persistence via Netlify Blobs & local portfolio-cms.json with fast timeouts
  */
 export class PortfolioService {
   private static data: PortfolioData = initialPortfolioData;
@@ -41,6 +41,21 @@ export class PortfolioService {
       return this.data || initialPortfolioData;
     }
 
+    // 1. Try /tmp in serverless container first if recently written
+    try {
+      const tmpPath = path.join("/tmp", "portfolio-cms.json");
+      if (fs.existsSync(tmpPath)) {
+        const fileContent = fs.readFileSync(tmpPath, "utf8");
+        const parsed = JSON.parse(fileContent) as PortfolioData;
+        if (parsed && parsed.profile) {
+          this.data = parsed;
+          this.initialized = true;
+          return this.data;
+        }
+      }
+    } catch {}
+
+    // 2. Try CMS_FILE_PATH in repository
     try {
       if (fs.existsSync(CMS_FILE_PATH)) {
         const fileContent = fs.readFileSync(CMS_FILE_PATH, "utf8");
@@ -65,6 +80,23 @@ export class PortfolioService {
   }
 
   /**
+   * Helper to initialize Netlify Blobs store
+   */
+  private static async getNetlifyStore() {
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      if (siteID && token) {
+        return getStore({ name: "portfolio-cms", siteID, token });
+      }
+      return getStore({ name: "portfolio-cms" });
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Asynchronously loads portfolio data with a strict 800ms timeout race.
    * If Netlify Blobs does not respond within 800ms, immediately returns cached/local data.
    * Guarantees zero "Inactivity Timeout" on Netlify.
@@ -72,25 +104,15 @@ export class PortfolioService {
   public static async getPortfolioDataAsync(): Promise<PortfolioData> {
     const fallback = this.loadFromDisk();
 
-    // Only attempt Netlify Blobs if on Netlify or token configured
-    const hasNetlifyContext =
-      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
-      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
-
-    if (!hasNetlifyContext) {
+    const mayHaveBlobs = Boolean(process.env.NETLIFY || process.env.NETLIFY_SITE_ID);
+    if (!mayHaveBlobs) {
       return fallback;
     }
 
     return withTimeout(
       async () => {
         try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-cms", siteID, token })
-            : getStore({ name: "portfolio-cms" });
-
+          const store = await this.getNetlifyStore();
           if (store) {
             const stored = await store.get("portfolio-data", { type: "json" });
             if (stored && (stored as any).profile && (stored as any).projects) {
@@ -121,41 +143,51 @@ export class PortfolioService {
         }
         fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
       } catch (fsErr: any) {
-        console.warn("Notice: Disk is read-only (EROFS), portfolio data updated in memory:", fsErr?.message);
+        try {
+          const tmpFile = path.join("/tmp", "portfolio-cms.json");
+          fs.writeFileSync(tmpFile, JSON.stringify(updatedData, null, 2), "utf8");
+        } catch {}
       }
     }
     return true;
   }
 
-  public static async savePortfolioDataAsync(updatedData: PortfolioData): Promise<boolean> {
+  /**
+   * Asynchronously persists portfolio data to Netlify Blobs and local storage.
+   * Returns strict success confirmation and truthful error messaging.
+   */
+  public static async savePortfolioDataAsync(
+    updatedData: PortfolioData
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       this.data = updatedData;
       this.initialized = true;
 
-      // 1. Persist to Netlify Blobs with a strict 3000ms timeout
-      await withTimeout(
-        async () => {
-          try {
-            const { getStore } = await import("@netlify/blobs");
-            const siteID = process.env.NETLIFY_SITE_ID;
-            const token = process.env.NETLIFY_AUTH_TOKEN;
-            const store = siteID && token
-              ? getStore({ name: "portfolio-cms", siteID, token })
-              : getStore({ name: "portfolio-cms" });
+      const isNetlifyEnv = Boolean(process.env.NETLIFY);
+      let cloudPersisted = false;
+      let cloudError: string | null = null;
 
-            if (store) {
-              await store.setJSON("portfolio-data", updatedData);
-            }
-          } catch (blobErr: any) {
-            console.warn("Notice: Netlify Blobs save notice:", blobErr?.message);
+      // 1. Persist to Netlify Blobs with a strict 3500ms timeout
+      try {
+        const store = await this.getNetlifyStore();
+        if (store) {
+          const writeBlob = async () => {
+            await store.setJSON("portfolio-data", updatedData);
+            return true;
+          };
+          cloudPersisted = await withTimeout(writeBlob(), 3500, false);
+          if (!cloudPersisted) {
+            cloudError = "Netlify Blobs write timed out or could not be completed.";
           }
-          return true;
-        },
-        3000,
-        false
-      );
+        } else {
+          cloudError = "Netlify Blobs environment is not configured. Please supply NETLIFY_SITE_ID and NETLIFY_AUTH_TOKEN in Netlify Site Settings > Environment Variables.";
+        }
+      } catch (blobErr: any) {
+        cloudError = blobErr?.message || "Netlify Blobs write rejected.";
+      }
 
       // 2. Persist to local disk if filesystem is writable
+      let diskPersisted = false;
       if (typeof window === "undefined") {
         try {
           const dir = path.dirname(CMS_FILE_PATH);
@@ -163,15 +195,35 @@ export class PortfolioService {
             fs.mkdirSync(dir, { recursive: true });
           }
           fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(updatedData, null, 2), "utf8");
+          diskPersisted = true;
         } catch (fsErr: any) {
-          console.warn("Notice: Local filesystem is read-only (EROFS):", fsErr?.message);
+          // AWS Lambda read-only container: write to writable /tmp directory
+          try {
+            const tmpFile = path.join("/tmp", "portfolio-cms.json");
+            fs.writeFileSync(tmpFile, JSON.stringify(updatedData, null, 2), "utf8");
+          } catch {}
         }
       }
 
-      return true;
-    } catch (err) {
+      // STRICT VALIDATION: If running in Netlify production, we MUST confirm cloud persistence.
+      if (isNetlifyEnv && !cloudPersisted) {
+        return {
+          success: false,
+          error: `Persistent Cloud Storage Error: ${cloudError || "Netlify Blobs write failed."} Please set NETLIFY_SITE_ID and NETLIFY_AUTH_TOKEN in Netlify Site Settings > Environment Variables.`,
+        };
+      }
+
+      if (!isNetlifyEnv && !diskPersisted && !cloudPersisted) {
+        return {
+          success: false,
+          error: "Failed to persist changes to local disk or cloud storage.",
+        };
+      }
+
+      return { success: true };
+    } catch (err: any) {
       console.error("Error in savePortfolioDataAsync:", err);
-      return false;
+      return { success: false, error: err?.message || "Failed to save portfolio data." };
     }
   }
 
@@ -180,7 +232,8 @@ export class PortfolioService {
   }
 
   public static async resetToDefaultAsync(): Promise<boolean> {
-    return this.savePortfolioDataAsync(initialPortfolioData);
+    const result = await this.savePortfolioDataAsync(initialPortfolioData);
+    return result.success;
   }
 
   public static getProfile(): ProfileInfo {

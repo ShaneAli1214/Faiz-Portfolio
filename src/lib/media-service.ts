@@ -10,11 +10,36 @@ const MEDIA_FILE_PATH = path.join(process.cwd(), "src", "data", "media.json");
 export class MediaService {
   private static inMemoryList: MediaItem[] | null = null;
 
+  private static async getNetlifyStore() {
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      const siteID = process.env.NETLIFY_SITE_ID;
+      const token = process.env.NETLIFY_AUTH_TOKEN;
+      if (siteID && token) {
+        return getStore({ name: "portfolio-media-meta", siteID, token });
+      }
+      return getStore({ name: "portfolio-media-meta" });
+    } catch {
+      return null;
+    }
+  }
+
   public static getMediaList(): MediaItem[] {
     if (this.inMemoryList) {
       return this.inMemoryList;
     }
 
+    // 1. Try /tmp on serverless container
+    try {
+      const tmpPath = path.join("/tmp", "media.json");
+      if (fs.existsSync(tmpPath)) {
+        const raw = fs.readFileSync(tmpPath, "utf8");
+        this.inMemoryList = JSON.parse(raw) as MediaItem[];
+        return this.inMemoryList;
+      }
+    } catch {}
+
+    // 2. Try repo media.json
     try {
       if (fs.existsSync(MEDIA_FILE_PATH)) {
         const raw = fs.readFileSync(MEDIA_FILE_PATH, "utf8");
@@ -33,24 +58,15 @@ export class MediaService {
   public static async getMediaListAsync(): Promise<MediaItem[]> {
     const fallback = this.getMediaList();
 
-    const hasNetlifyContext =
-      Boolean(process.env.NETLIFY_SITE_ID && process.env.NETLIFY_AUTH_TOKEN) ||
-      Boolean(process.env.NETLIFY && process.env.NETLIFY_BLOBS_CONTEXT);
-
-    if (!hasNetlifyContext) {
+    const mayHaveBlobs = Boolean(process.env.NETLIFY || process.env.NETLIFY_SITE_ID);
+    if (!mayHaveBlobs) {
       return fallback;
     }
 
     return withTimeout(
       async () => {
         try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-media-meta", siteID, token })
-            : getStore({ name: "portfolio-media-meta" });
-
+          const store = await this.getNetlifyStore();
           if (store) {
             const stored = await store.get("media-list", { type: "json" });
             if (Array.isArray(stored)) {
@@ -79,7 +95,10 @@ export class MediaService {
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(MEDIA_FILE_PATH, JSON.stringify(filtered, null, 2), "utf8");
     } catch (fsErr: any) {
-      console.warn("Notice: Disk is read-only (EROFS), media retained in-memory:", fsErr?.message);
+      try {
+        const tmpFile = path.join("/tmp", "media.json");
+        fs.writeFileSync(tmpFile, JSON.stringify(filtered, null, 2), "utf8");
+      } catch {}
     }
 
     return true;
@@ -92,13 +111,7 @@ export class MediaService {
     await withTimeout(
       async () => {
         try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-media-meta", siteID, token })
-            : getStore({ name: "portfolio-media-meta" });
-
+          const store = await this.getNetlifyStore();
           if (store && this.inMemoryList) {
             await store.setJSON("media-list", this.inMemoryList);
           }
@@ -124,7 +137,10 @@ export class MediaService {
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(MEDIA_FILE_PATH, JSON.stringify(filtered, null, 2), "utf8");
     } catch (fsErr: any) {
-      console.warn("Notice: Disk is read-only (EROFS):", fsErr?.message);
+      try {
+        const tmpFile = path.join("/tmp", "media.json");
+        fs.writeFileSync(tmpFile, JSON.stringify(filtered, null, 2), "utf8");
+      } catch {}
     }
 
     return true;
@@ -137,13 +153,7 @@ export class MediaService {
     await withTimeout(
       async () => {
         try {
-          const { getStore } = await import("@netlify/blobs");
-          const siteID = process.env.NETLIFY_SITE_ID;
-          const token = process.env.NETLIFY_AUTH_TOKEN;
-          const store = siteID && token
-            ? getStore({ name: "portfolio-media-meta", siteID, token })
-            : getStore({ name: "portfolio-media-meta" });
-
+          const store = await this.getNetlifyStore();
           if (store && this.inMemoryList) {
             await store.setJSON("media-list", this.inMemoryList);
           }
